@@ -1,19 +1,21 @@
-    import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class Renda{
+    private static List<Renda> bancoDeDadosRenda = new ArrayList<>();
     private String idRenda;
     private String nomeRenda;
     private double valor;
     private Date data;
     private boolean tipoRenda;
+    private static int contador = 0;
 
-    // --- Construtor Vazio (Boas práticas) ---
+    
     public Renda() {
     }
 
-    // --- Construtor Completo (Para preencher tudo de uma vez) ---
+
     public Renda(String idRenda, String nomeRenda, double valor, Date data, boolean tipoRenda) {
         this.idRenda = idRenda;
         this.nomeRenda = nomeRenda;
@@ -22,7 +24,7 @@ public class Renda{
         this.tipoRenda = tipoRenda;
     }
 
-    // Getters e Setters para manipular os dados.
+  
 
     public String getIdRenda() {
         return idRenda;
@@ -56,7 +58,7 @@ public class Renda{
         this.data = data;
     }
 
-    // DICA: Para booleanos, o padrão Java costuma usar "is" no lugar de "get"
+  
     public boolean isTipoRenda() {
         return tipoRenda;
     }
@@ -65,4 +67,29 @@ public class Renda{
         this.tipoRenda = tipoRenda;
     }
 
+    public static Renda cadastrarRenda(String nome, double valor, Date data, boolean tipoRenda) {
+
+    contador++; 
+
+    String novoId = "R" + contador; 
+
+    return new Renda(novoId, nome, valor, data, tipoRenda);
+    }
+
+    public void editarRenda(String nome, double valor) {
+    
+        this.nomeRenda = nome;
+        this.valor = valor;
+        
 }
+
+public static boolean excluirRenda(Renda renda) {
+    return bancoDeDadosRenda.remove(renda);
+}
+
+
+
+
+    }
+
+
