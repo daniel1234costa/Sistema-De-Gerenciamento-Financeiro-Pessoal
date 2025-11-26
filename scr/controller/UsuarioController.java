@@ -5,21 +5,21 @@ import model.UsuarioDAO;
 import org.mindrot.jbcrypt.BCrypt;
 import java.util.Date;
 import java.util.UUID; 
-import java.util.List; 
-import java.util.ArrayList; 
+import java.util.Scanner;
+import java.sql.SQLException;
+import java.sql.Types; // Import necessário para java.sql.Types
 
 public class UsuarioController {
     
-   
-    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
+    // ATENÇÃO: O DAO deve ser estático para ser acessado por métodos estáticos.
+    private static final UsuarioDAO usuarioDAO = new UsuarioDAO();
 
-    // ----------------------------------------------------
-    // METODOS DE AUTENTICAÇÃO (JÁ EXISTENTES)
-    // ----------------------------------------------------
-
-    public boolean registrarNovoUsuario(String nome, String email, String senhaPura, Date dataNascimento) {
+    
+    /**
+     * Registra um novo usuário. MÉTODO AGORA ESTÁTICO.
+     */
+    public static boolean registrarUsuario(String nome, String email, String senhaPura, Date dataNascimento) {
         
-        // Gera o hash da senha
         String senhaHash = BCrypt.hashpw(senhaPura, BCrypt.gensalt());
 
         Usuario novoUsuario = new Usuario();
@@ -32,7 +32,8 @@ public class UsuarioController {
         return usuarioDAO.registrarUsuario(novoUsuario);
     }
 
-    public Usuario login(String email, String senhaPura) {
+    
+    public static Usuario login(String email, String senhaPura) {
         
         Usuario usuarioDB = usuarioDAO.buscarPorEmail(email);
 
@@ -53,22 +54,48 @@ public class UsuarioController {
             return null;
         }
     }
+    
+   
 
 
 
-    // Métodos finalizados registrar e login que utilizam banco de dados;
-    // Editar usuario ainda apresenta problemas;
-    // excluir ainda precisa ser testado.
+public boolean atualizarUsuario(Usuario usuario) {
+    
+    String sql = "UPDATE Usuario SET nome = ?, email = ?, data_nascimento = ? WHERE id_usuario = ?";
+    
+    try (java.sql.Connection conn = model.DatabaseConnector.conectar();
+         java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+        stmt.setString(1, usuario.getNome());
+        stmt.setString(2, usuario.getEmail());
+        
+        
+        if (usuario.getDataNascimento() != null) {
+           
+            java.sql.Date sqlDate = new java.sql.Date(usuario.getDataNascimento().getTime());
+            
+          
+            stmt.setDate(3, sqlDate); 
+        } else {
+          
+            stmt.setNull(3, java.sql.Types.DATE); 
+        }
+       
+        
+        stmt.setString(4, usuario.getIdUsuario()); 
+        
+        int linhasAfetadas = stmt.executeUpdate();
+        return linhasAfetadas > 0; 
+        
+    } catch (java.sql.SQLException e) {
+        System.err.println("Erro ao atualizar usuário: " + e.getMessage());
+        return false;
+    }
+}
 
-
-    /**
-     * Atualiza o nome, email e data de nascimento do usuário.
-     * @param usuario O objeto Usuario com as informações atualizadas.
-     * @return true se a atualização foi bem-sucedida, false caso contrário.
-     */
+    
     public boolean editarUsuario(Usuario usuario) {
-        // Validação básica do Controller
+        
         if (usuario.getIdUsuario() == null || usuario.getIdUsuario().isEmpty()) {
             System.err.println("Erro: ID do usuário é necessário para a edição.");
             return false;
@@ -76,48 +103,34 @@ public class UsuarioController {
 
         System.out.println("-> Tentando atualizar perfil do usuário: " + usuario.getNome());
         
-        // Chama o método DAO para persistência (UPDATE)
-        boolean sucesso = usuarioDAO.atualizarUsuario(usuario);
+        boolean sucesso = this.atualizarUsuario(usuario);
 
         if (sucesso) {
-            System.out.println("✅ Perfil atualizado com sucesso!");
+            System.out.println("Perfil atualizado com sucesso!");
         } else {
-            System.err.println("❌ Falha ao atualizar o perfil. Verifique o ID e o email.");
+            System.err.println("Falha ao atualizar o perfil. Verifique o ID e o email.");
         }
         return sucesso;
     }
 
-    /**
-     * Remove o usuário do banco de dados permanentemente.
-     * @param idUsuario O ID do usuário a ser excluído.
-     * @return true se a exclusão foi bem-sucedida, false caso contrário.
-     */
-    public boolean excluirUsuario(String idUsuario) {
-        // Validação básica do Controller
-        if (idUsuario == null || idUsuario.isEmpty()) {
-            System.err.println("Erro: ID do usuário é necessário para a exclusão.");
-            return false;
-        }
-
-        System.out.println("-> Excluindo usuário (ID: " + idUsuario + ")");
+    
+    public static void excluirUsuario() {
+        System.out.println("Excluir Usuário - Iniciando processo...");
         
-        // Chama o método DAO para persistência (DELETE)
-        boolean sucesso = usuarioDAO.excluirUsuario(idUsuario);
+        // Mantido o Scanner local para interação estática
+        Scanner scanner = new Scanner(System.in); 
+        
+        System.out.print("Digite o email do usuário a ser excluído: ");
+        String email = scanner.nextLine(); 
 
-        if (sucesso) {
-            System.out.println("✅ Usuário excluído permanentemente.");
+        Usuario usuario = usuarioDAO.buscarPorEmail(email); 
+
+        if (usuario != null) {
+            
+            usuarioDAO.excluir(usuario.getIdUsuario()); 
+            System.out.println("Usuário excluído com sucesso.");
         } else {
-            System.err.println("❌ Falha ao excluir o usuário. ID não encontrado.");
+            System.out.println("Usuário não encontrado com o email: " + email);
         }
-        return sucesso;
-    }
-
-    /**
-     * Lista todos os usuários cadastrados.
-     * @return Uma lista de objetos Usuario.
-     */
-    public List<Usuario> listarTodosUsuarios() {
-        System.out.println("-> Buscando todos os usuários no sistema...");
-        return usuarioDAO.listarTodosUsuarios(); // Chama o método DAO
     }
 }
