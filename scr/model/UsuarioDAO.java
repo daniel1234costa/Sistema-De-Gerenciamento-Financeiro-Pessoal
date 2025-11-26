@@ -85,7 +85,28 @@ public class UsuarioDAO {
         return usuario;
     }
     
-    // --- (C) Excluir Usuário (DELETE) ---
-    // (O código de exclusão é o mesmo que antes)
-    // ...
+   public void excluir(String idUsuario) {
+        // SQL para deletar um usuário pelo seu ID único
+        String sql = "DELETE FROM Usuario WHERE id_usuario = ?";
+
+        try (Connection conn = DatabaseConnector.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Define o ID do usuário a ser excluído no primeiro parâmetro
+            stmt.setString(1, idUsuario);
+
+            int linhasAfetadas = stmt.executeUpdate();
+
+            if (linhasAfetadas > 0) {
+                // Mensagem de sucesso no nível DAO
+                System.out.println("Registro de usuário ID " + idUsuario + " excluído.");
+            } else {
+                System.out.println("Nenhum registro encontrado para exclusão com o ID: " + idUsuario);
+            }
+
+        } catch (SQLException e) {
+            // Loga o erro, mas não lança (o Controller lidará com o resultado booleano, se houver)
+            System.err.println("Erro ao executar exclusão no banco de dados: " + e.getMessage());
+        }
+    }
 }
