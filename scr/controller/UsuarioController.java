@@ -110,22 +110,16 @@ public boolean atualizarUsuario(Usuario usuario) {
     }
 
     
-    public static void excluirUsuario() {
-        System.out.println("Excluir Usuário - Iniciando processo...");
-        
-        Scanner scanner = new Scanner(System.in); 
-        
-        System.out.print("Digite o email do usuário a ser excluído: ");
-        String email = scanner.nextLine(); 
+    public static void excluirUsuario(String email) {
 
-        Usuario usuario = usuarioDAO.buscarPorEmail(email); 
+    Usuario usuario = usuarioDAO.buscarPorEmail(email);
 
-        if (usuario != null) {
-            
-            usuarioDAO.excluir(usuario.getIdUsuario()); 
-            System.out.println("Usuário excluído com sucesso.");
-        } else {
-            System.out.println("Usuário não encontrado com o email: " + email);
-        }
+    if (usuario != null) {
+        usuarioDAO.excluir(usuario.getIdUsuario());
+        System.out.println("Usuário excluído com sucesso.");
+    } else {
+        System.out.println("Usuário não encontrado com o email: " + email);
     }
+}
+
 }

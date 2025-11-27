@@ -108,11 +108,11 @@ public class TelaUsuario {
             Date dataNascimento = dateFormat.parse(dataStr);
             boolean sucesso = controller.registrarUsuario(nome, email, senha, dataNascimento);
             
-            if (sucesso) System.out.println("✅ Usuário registrado com sucesso!");
-            else System.err.println("❌ Falha ao registrar. Email pode já existir.");
+            if (sucesso) System.out.println(" Usuário registrado com sucesso!");
+            else System.err.println(" Falha ao registrar. Email pode já existir.");
             
         } catch (ParseException e) {
-            System.err.println("❌ Data inválida.");
+            System.err.println(" Data inválida.");
         }
     }
 
@@ -160,10 +160,11 @@ public class TelaUsuario {
         }
     }
 
-    private boolean excluirConta(Usuario usuarioLogado) {
+        private boolean excluirConta(Usuario usuarioLogado) {
         System.out.print("Deseja realmente EXCLUIR sua conta? Digite 'SIM': ");
         if (scanner.nextLine().equalsIgnoreCase("SIM")) {
-            controller.excluirUsuario(usuarioLogado.getEmail());
+
+            controller.excluirUsuario(usuarioLogado.getEmail()); 
             return true;
         }
         return false;
