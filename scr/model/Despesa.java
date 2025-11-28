@@ -60,32 +60,12 @@ public class Despesa {
         this.categoria = categoria;
     }
 
-    @Override
-    public String toString() {
-        return "Despesa{" +
-                "idDespesa='" + idDespesa + '\'' +
-                ", nomeDespesa='" + nomeDespesa + '\'' +
-                ", valor=" + valor +
-                ", data=" + data +
-                ", categoria=" + categoria +
-                '}';
-    }
-
     public void visualizarDespesa(){
-        System.out.println("ID da Despesa: " +idDespesa);
-        System.out.println("Nome da Despesa: " +nomeDespesa);
-        System.out.println("Valor da Despesa: " +valor);
-        System.out.println("Data da Despesa: " +data);
+        System.out.println("ID da Despesa: " +this.idDespesa);
+        System.out.println("Nome da Despesa: " +this.nomeDespesa);
+        System.out.println("Valor da Despesa: " +this.valor);
+        System.out.println("Data da Despesa: " +this.data);
         System.out.println("Categoria da Despesa: " +categoria.getNomeCategoria());
-    }
-
-    public static Despesa cadastrarDespesa(String nome, double valor, Date data, Categoria categoria) {
-        Despesa novaDespesa = new Despesa();
-        novaDespesa.setNomeDespesa(nome);
-        novaDespesa.setValor(valor);
-        novaDespesa.setData(data);
-        novaDespesa.setCategoria(categoria);
-        return novaDespesa;
     }
 
 

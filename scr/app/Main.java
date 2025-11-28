@@ -1,9 +1,11 @@
 package app;
 
 import java.util.Scanner;
+
 import views.TelaCategoria;
 import views.TelaRenda;
 import views.TelaUsuario;
+import views.TelaDespesa;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,7 +17,7 @@ public class Main {
             System.out.println("      SISTEMA DE FINANÇAS PESSOAIS");
             System.out.println("==========================================");
             System.out.println("1. Módulo de Rendas ");
-            System.out.println("2. Módulo de Despesas  (Em breve)");
+            System.out.println("2. Módulo de Despesas ");
             System.out.println("3. Módulo de Usuários ");
             System.out.println("4. Módulo de Categorias ");
             System.out.println("0. Sair do Sistema");
@@ -46,7 +48,8 @@ public class Main {
                     break;
                 
                 case 2:
-                    System.out.println("O módulo de Despesas ainda está em construção!");
+                    TelaDespesa telaDespesa = new TelaDespesa();
+                    telaDespesa.exibirMenu();
                     break;
 
                 case 3:
