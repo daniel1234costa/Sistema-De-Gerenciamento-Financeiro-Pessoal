@@ -16,8 +16,7 @@ public class Despesa {
         this.categoria = categoria;
     }
 
-    public Despesa () {
-        
+    public Despesa() {
     }
 
     public String getIdDespesa() {
@@ -60,7 +59,7 @@ public class Despesa {
         this.categoria = categoria;
     }
 
-    public void visualizarDespesa(){
+    public void visualizar(){
         System.out.println("ID da Despesa: " +this.idDespesa);
         System.out.println("Nome da Despesa: " +this.nomeDespesa);
         System.out.println("Valor da Despesa: " +this.valor);
@@ -68,5 +67,6 @@ public class Despesa {
         System.out.println("Categoria da Despesa: " +categoria.getNomeCategoria());
     }
 
+    
 
 }
