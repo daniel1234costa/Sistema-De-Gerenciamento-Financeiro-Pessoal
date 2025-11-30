@@ -17,17 +17,13 @@ CREATE TABLE IF NOT EXISTS Categoria (
 
 
 CREATE TABLE IF NOT EXISTS Renda (
-    idRenda VARCHAR(255) PRIMARY KEY,
-    idUsuario VARCHAR(255) NOT NULL,
-    idCategoria VARCHAR(255) NOT NULL,
+    idRenda INTEGER PRIMARY KEY AUTOINCREMENT,
+    idUsuario INTEGER NOT NULL,
     nomeRenda VARCHAR(255) NOT NULL,
     valor NUMERIC(10, 2) NOT NULL,
-    data DATE NOT NULL,
-    
-   
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
-   
-    FOREIGN KEY (idCategoria) REFERENCES Categoria(idCategoria) ON DELETE RESTRICT 
+    data TEXT NOT NULL,                       
+    tipo BOOLEAN NOT NULL,                   
+    FOREIGN KEY (idUsuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Despesa (

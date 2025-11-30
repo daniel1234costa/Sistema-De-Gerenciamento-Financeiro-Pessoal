@@ -9,8 +9,8 @@ import java.util.List;
 
 public class RendaDAO {
 
-    public Renda cadastrarRenda(String nome, double valor, java.util.Date data, boolean tipoRenda) {
-        Renda novaRenda = new Renda(nome, valor, data, tipoRenda);
+    public Renda cadastrarRenda(String nomeRenda, double valor, java.util.Date data, boolean tipoRenda) {
+        Renda novaRenda = new Renda(nomeRenda, valor, data, tipoRenda);
         // ID Usuario 1 fixo por enquanto
         String sql = "INSERT INTO renda (nome, valor, data, tipo, id_usuario) VALUES (?, ?, ?, ?, 1)";
 

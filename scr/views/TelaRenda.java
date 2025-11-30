@@ -47,13 +47,26 @@ public class TelaRenda {
         System.out.println("\n--- NOVA RENDA ---");
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
+
         System.out.print("Valor: ");
         double valor = scanner.nextDouble();
-        scanner.nextLine();
-        System.out.print("Data (dd/MM/yyyy): ");
-        Date data = UtilData.parseData(scanner.nextLine()); 
+        
+        // Pedindo separado para evitar erro de digitação
+        System.out.print("Dia: ");
+        int dia = scanner.nextInt();
+        System.out.print("Mês: ");
+        int mes = scanner.nextInt();
+        System.out.print("Ano: ");
+        int ano = scanner.nextInt();
+        
+        // Monta a String "dd/MM/yyyy" para o UtilData converter
+       // Monta no formato Ano-Mês-Dia para o UtilData aceitar
+        String dataTexto = String.format("%d-%02d-%02d", ano, mes, dia);
+        Date data = UtilData.parseData(dataTexto);
+
         System.out.print("É fixa? (true/false): ");
         boolean tipo = scanner.nextBoolean();
+        scanner.nextLine(); // Limpar buffer
 
         controller.cadastrarRenda(nome, valor, data, tipo);
     }
