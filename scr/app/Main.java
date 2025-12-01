@@ -49,7 +49,7 @@ public class Main {
                 
                 case 2:
                     TelaDespesa telaDespesa = new TelaDespesa();
-                 //  telaDespesa.exibirMenu();
+                    telaDespesa.exibirMenu();
                     break;
 
                 case 3:
