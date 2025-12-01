@@ -18,7 +18,7 @@ public class DespesaDAO {
 
     private static final String SQL_INSERT = 
         "INSERT INTO Despesa (idDespesa, idUsuario, nomeDespesa, valor, data, idCategoria) VALUES (?, ?, ?, ?, ?, ?)";
-    
+   
     private static final String SQL_SELECT_ALL_BY_USER = 
         "SELECT * FROM Despesa WHERE idUsuario = ? ORDER BY substr(data, 7, 4) || substr(data, 4, 2) || substr(data, 1, 2) DESC";
 
@@ -34,20 +34,36 @@ public class DespesaDAO {
     
     private static final String SQL_SELECT_BY_PERIOD = 
         "SELECT * FROM Despesa WHERE idUsuario = ? AND data BETWEEN ? AND ? ORDER BY data DESC";
-   
+    
     private static final String SQL_CALCULATE_MONTHLY = 
         "SELECT SUM(valor) AS total FROM Despesa WHERE idUsuario = ? AND strftime('%m', data) = ? AND strftime('%Y', data) = ?";
 
 
-    // --- CADASTRAR ---
+   
+    private Despesa mapResultSetToDespesa(ResultSet rs) throws SQLException {
+        Despesa d = new Despesa();
+       
+        d.setIdDespesa(rs.getString("idDespesa"));
+        d.setIdUsuario(rs.getString("idUsuario"));
+        d.setNomeDespesa(rs.getString("nomeDespesa")); 
+        d.setValor(rs.getDouble("valor"));
+       
+        d.setData(UtilData.parseData(rs.getString("data"))); 
+        d.setIdCategoria(rs.getString("idCategoria"));
+        return d;
+    }
+
+
+  
     public boolean cadastrarDespesa(Despesa despesa) {
+      
+        if (despesa.getIdDespesa() == null || despesa.getIdDespesa().isEmpty()) {
+             despesa.setIdDespesa(UUID.randomUUID().toString());
+         }
+
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
             
-            if (despesa.getIdDespesa() == null || despesa.getIdDespesa().isEmpty()) {
-                despesa.setIdDespesa(UUID.randomUUID().toString());
-            }
-
             stmt.setString(1, despesa.getIdDespesa());
             stmt.setString(2, despesa.getIdUsuario());
             stmt.setString(3, despesa.getNomeDespesa()); 
@@ -56,7 +72,8 @@ public class DespesaDAO {
             stmt.setString(6, despesa.getIdCategoria());
 
             stmt.execute();
-            System.out.println(" Despesa cadastrada com sucesso!");
+          
+            // System.out.println(" Despesa cadastrada com sucesso!"); 
             return true;
             
         } catch (SQLException e) {
@@ -65,7 +82,7 @@ public class DespesaDAO {
         }
     }
 
-    // --- LISTAR TODAS DO USUÁRIO ---
+  
     public List<Despesa> listarDespesas(String idUsuario) {
         List<Despesa> lista = new ArrayList<>();
         try (Connection conn = DatabaseConnector.conectar();
@@ -83,10 +100,10 @@ public class DespesaDAO {
         return lista;
     }
 
-   
+ 
     public List<Despesa> listarDespesasPorCategoria(String idUsuario, String idCategoria) {
         List<Despesa> lista = new ArrayList<>();
-       
+        
         String sql = "SELECT * FROM Despesa WHERE idUsuario = ? AND idCategoria = ? ORDER BY substr(data, 7, 4) || substr(data, 4, 2) || substr(data, 1, 2) DESC";
         
         try (Connection conn = DatabaseConnector.conectar();
@@ -105,7 +122,7 @@ public class DespesaDAO {
         return lista;
     }
 
-    
+   
     public Despesa buscarPorId(String idDespesa) {
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_BY_ID)) {
@@ -125,13 +142,14 @@ public class DespesaDAO {
   
     public List<Despesa> listarDespesasPorPeriodo(String idUsuario, Date inicio, Date fim) {
         List<Despesa> lista = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Formato deve ser o mesmo usado no BD
+    
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); 
 
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_BY_PERIOD)) {
             
             stmt.setString(1, idUsuario);
-           
+            
             stmt.setString(2, sdf.format(inicio)); 
             stmt.setString(3, sdf.format(fim));
             
@@ -146,11 +164,11 @@ public class DespesaDAO {
         return lista;
     }
 
-  
+   
     public double calcularDespesaTotalMensal(int mes, int ano, String idUsuario) {
         double total = 0;
-       
-        String mesStr = String.format("%02d", mes); 
+        
+        String mesStr = String.format("%02d", mes); // Garante 01, 02, etc.
         String anoStr = String.valueOf(ano);
         
         try (Connection conn = DatabaseConnector.conectar();
@@ -163,7 +181,7 @@ public class DespesaDAO {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-              
+             
                 total = rs.getDouble("total");
             }
         } catch (SQLException e) {
@@ -173,7 +191,6 @@ public class DespesaDAO {
     }
 
 
-    // --- EDITAR ---
     public boolean editarDespesa(Despesa despesa) {
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE)) {
@@ -182,20 +199,18 @@ public class DespesaDAO {
             stmt.setDouble(2, despesa.getValor());
             stmt.setString(3, UtilData.formatarData(despesa.getData()));
             stmt.setString(4, despesa.getIdCategoria());
-            stmt.setString(5, despesa.getIdDespesa());
+            stmt.setString(5, despesa.getIdDespesa()); 
 
             int linhas = stmt.executeUpdate();
-            if (linhas > 0) {
-                System.out.println("Despesa atualizada!");
-                return true;
-            }
+            
+            return linhas > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao editar despesa: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    // --- EXCLUIR ---
+  
     public boolean excluirDespesa(String idDespesa) {
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(SQL_DELETE)) {
@@ -203,31 +218,11 @@ public class DespesaDAO {
             stmt.setString(1, idDespesa);
             int linhas = stmt.executeUpdate();
             
-            if (linhas > 0) {
-                System.out.println("Despesa excluída.");
-                return true;
-            }
+         
+            return linhas > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao excluir despesa: " + e.getMessage());
+            return false;
         }
-        return false;
     }
-
-    // --- MÉTODO AUXILIAR ---
-    private Despesa mapResultSetToDespesa(ResultSet rs) throws SQLException {
-        Despesa d = new Despesa();
-     
-        d.setIdDespesa(rs.getString("idDespesa"));
-        d.setIdUsuario(rs.getString("idUsuario"));
-        d.setNomeDespesa(rs.getString("nomeDespesa")); 
-        d.setValor(rs.getDouble("valor"));
-        d.setData(UtilData.parseData(rs.getString("data"))); 
-        d.setIdCategoria(rs.getString("idCategoria"));
-        return d;
-    }
-    
-    
-    public void visualizarDespesa(String idDespesa) {
-        
-}
 }

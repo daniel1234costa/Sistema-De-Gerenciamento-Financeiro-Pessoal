@@ -49,7 +49,7 @@ public class Despesa {
         return dao.listarDespesasPorPeriodo(idUsuario, inicio, fim);
     }
     
-  
+ 
     public static List<Despesa> listarDespesasPorCategoria(String idCategoria) {
    
         if (Sessao.getIdUsuarioLogado() == null) {
@@ -60,7 +60,7 @@ public class Despesa {
         return dao.listarDespesasPorCategoria(Sessao.getIdUsuarioLogado(), idCategoria);
     }
     
-  
+ 
     public static Despesa buscarDespesaPorId(String idDespesa) {
         DespesaDAO dao = new DespesaDAO();
         return dao.buscarPorId(idDespesa);
@@ -78,17 +78,18 @@ public class Despesa {
         dao.editarDespesa(this);
     }
 
+   
     public void visualizarDespesa() {
         DespesaDAO dao = new DespesaDAO();
-        dao.visualizarDespesa(this.idDespesa);
+        dao.visualizarDespesa(this.idDespesa); 
     }
 
    
     public String getIdDespesa() {
           return idDespesa;
-          }
+        }
     public void setIdDespesa(String idDespesa) {
-          this.idDespesa = idDespesa; 
+        this.idDespesa = idDespesa; 
         }
 
     public String getNomeDespesa() { 
