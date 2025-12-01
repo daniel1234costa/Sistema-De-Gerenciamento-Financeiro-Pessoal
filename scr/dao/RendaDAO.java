@@ -13,28 +13,30 @@ import model.UtilData;
 
 public class RendaDAO {
 
-    public Renda cadastrarRenda(String nomeRenda, double valor, java.util.Date data, boolean tipoRenda) {
-        Renda novaRenda = new Renda(nomeRenda, valor, data, tipoRenda);
-        // ID Usuario 1 fixo por enquanto
-        String sql = "INSERT INTO renda (nome, valor, data, tipo, id_usuario) VALUES (?, ?, ?, ?, 1)";
+   public static Renda cadastrarRenda(String nome, double valor, java.util.Date data, boolean tipoRenda) {
+        Renda novaRenda = new Renda(nome, valor, data, tipoRenda);
+        
+        // 1. GERA O UUID (String) AQUI
+        String novoId = java.util.UUID.randomUUID().toString();
+        novaRenda.setIdRenda(novoId);
+
+        // SQL ajustado: enviamos o ID manualmente agora
+        String sql = "INSERT INTO renda (id, nome, valor, data, tipo, id_usuario) VALUES (?, ?, ?, ?, ?, '1')";
 
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, novaRenda.getNomeRenda());
-            stmt.setDouble(2, novaRenda.getValor());
-            stmt.setString(3, UtilData.formatarData(novaRenda.getData()));
-            stmt.setBoolean(4, novaRenda.isTipoRenda());
+            stmt.setString(1, novaRenda.getIdRenda()); // Envia o UUID gerado
+            stmt.setString(2, novaRenda.getNomeRenda());
+            stmt.setDouble(3, novaRenda.getValor());
+            stmt.setString(4, UtilData.formatarData(novaRenda.getData()));
+            stmt.setBoolean(5, novaRenda.isTipoRenda());
 
             stmt.execute();
-            
-            try (ResultSet gk = stmt.getGeneratedKeys()) {
-                if (gk.next()) novaRenda.setIdRenda(String.valueOf(gk.getInt(1)));
-            }
-            System.out.println("✅ Renda cadastrada no SQLite!");
+            System.out.println("✅ Renda cadastrada! ID: " + novaRenda.getIdRenda());
 
         } catch (SQLException e) {
-            System.out.println(" Erro ao cadastrar: " + e.getMessage());
+            System.out.println("Erro ao cadastrar: " + e.getMessage());
             return null;
         }
         return novaRenda;

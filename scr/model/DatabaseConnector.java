@@ -59,7 +59,7 @@ public class DatabaseConnector {
 
             // --- RENDA ---
             stmt.execute("CREATE TABLE IF NOT EXISTS Renda ("
-                    + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "id TEXT PRIMARY KEY, "
                     + "nome VARCHAR(255) NOT NULL, "
                     + "valor NUMERIC(10, 2) NOT NULL, "
                     + "data TEXT NOT NULL, "

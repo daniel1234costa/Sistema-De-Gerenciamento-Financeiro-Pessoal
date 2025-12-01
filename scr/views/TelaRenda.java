@@ -1,5 +1,6 @@
 package views;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -107,14 +108,37 @@ public class TelaRenda {
         else System.out.println(" Erro ao excluir.");
     }
 
-    private void visualizar() {
-        System.out.print("ID: ");
-        String id = scanner.next();
-        
-        // Visualizar é instância no Model
-        Renda r = new Renda();
-        r.setIdRenda(id);
-        r.visualizarRenda();
+  private void visualizar() {
+        System.out.println("\n--- ESCOLHA UMA RENDA ---");
+
+        // 1. Busca direto do Model (Renda)
+        List<Renda> todas = new ArrayList<>();
+        todas.addAll(Renda.listarRendasFixas());
+        todas.addAll(Renda.listarRendasExtras());
+
+        if (todas.isEmpty()) {
+            System.out.println("Nenhuma renda cadastrada.");
+            return;
+        }
+
+        // 2. Mostra a lista numerada
+        for (int i = 0; i < todas.size(); i++) {
+            System.out.println((i + 1) + ". " + todas.get(i).getNomeRenda() + " (R$ " + todas.get(i).getValor() + ")");
+        }
+
+        System.out.print("Digite o número da renda: ");
+        int opcao = scanner.nextInt();
+        scanner.nextLine(); 
+
+        if (opcao > 0 && opcao <= todas.size()) {
+            // 3. Pega o objeto da lista
+            Renda rendaSelecionada = todas.get(opcao - 1);
+            
+            // 4. Chama o método de instância direto do objeto (ele já tem o ID dentro dele)
+            rendaSelecionada.visualizarRenda();
+        } else {
+            System.out.println("Opção inválida!");
+        }
     }
 
     private void totalMensal() {
