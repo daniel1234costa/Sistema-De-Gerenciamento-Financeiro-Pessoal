@@ -1,9 +1,9 @@
 package model;
 
+import dao.DespesaDAO;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import dao.DespesaDAO;
 
 public class Despesa {
 
@@ -78,11 +78,6 @@ public class Despesa {
         dao.editarDespesa(this);
     }
 
-   
-    public void visualizarDespesa() {
-        DespesaDAO dao = new DespesaDAO();
-        dao.visualizarDespesa(this.idDespesa); 
-    }
 
    
     public String getIdDespesa() {
