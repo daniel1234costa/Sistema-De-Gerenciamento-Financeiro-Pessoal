@@ -2,6 +2,7 @@ package app;
 
 import java.util.Scanner;
 
+import model.Sessao;
 import views.TelaCategoria;
 import views.TelaRenda;
 import views.TelaUsuario;
@@ -11,62 +12,128 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
-      
         while (true) {
-            System.out.println("\n==========================================");
-            System.out.println("      SISTEMA DE FINANÇAS PESSOAIS");
-            System.out.println("==========================================");
-            System.out.println("1. Módulo de Rendas ");
-            System.out.println("2. Módulo de Despesas ");
-            System.out.println("3. Módulo de Usuários ");
-            System.out.println("4. Módulo de Categorias ");
-            System.out.println("0. Sair do Sistema");
-            System.out.println("==========================================");
-            System.out.print("Escolha uma opção: ");
+            
+            if (!Sessao.isLogado()) {
+                exibirMenuAcesso(scanner);
+            } else {
+                exibirMenuPrincipal(scanner);
+            }
+            
+            // Loop continua até que System.exit(0) seja chamado
+        } 
+        
+        // scanner.close(); // Não alcançável devido ao System.exit(0)
+    }
+    
+    // ==========================================================
+    // === MÉTODOS DE MENU ======================================
+    // ==========================================================
 
-            int opcao = 0;
-            try {
+    private static void exibirMenuAcesso(Scanner scanner) {
+        System.out.println("\n==========================================");
+        System.out.println("      SISTEMA DE FINANÇAS PESSOAIS");
+        System.out.println("==========================================");
+        System.out.println("1. Login / Entrar");
+        System.out.println("2. Cadastrar Novo Usuário");
+        System.out.println("0. Sair do Sistema");
+        System.out.println("==========================================");
+        System.out.print("Escolha uma opção: ");
+
+        int opcao = 0;
+        try {
+            if (scanner.hasNextInt()) {
                 opcao = scanner.nextInt();
-                scanner.nextLine(); // Limpar o 'enter' do buffer
-            } catch (Exception e) {
+                scanner.nextLine();
+            } else {
+                scanner.nextLine();
                 System.out.println("Por favor, digite apenas números!");
-                scanner.nextLine(); // Limpa a sujeira do scanner
-                continue; // Volta pro começo do loop
+                return;
             }
+        } catch (Exception e) {
+            scanner.nextLine();
+            System.out.println("Entrada inválida.");
+            return;
+        }
 
-            if (opcao == 0) {
-                System.out.println("Saindo... Até logo!");
+        switch (opcao) {
+            case 1:
+                TelaUsuario telaLogin = new TelaUsuario(scanner);
+                String idLogado = telaLogin.exibirMenuLogin(); 
+                if (idLogado != null) {
+                    Sessao.logar(idLogado);
+                }
                 break;
+            case 2:
+                TelaUsuario telaCadastro = new TelaUsuario(scanner);
+                telaCadastro.exibirMenuCadastro(); 
+                break;
+            case 0:
+                System.out.println("Saindo... Até logo!");
+                System.exit(0);
+                break;
+            default:
+                System.out.println("Opção inválida!");
+        }
+    }
+    
+    private static void exibirMenuPrincipal(Scanner scanner) {
+        System.out.println("\n==========================================");
+        System.out.println("       MENU PRINCIPAL (ID: " + Sessao.getIdUsuarioLogado().substring(0, 8) + "...)");
+        System.out.println("==========================================");
+        System.out.println("1. Módulo de Rendas ");
+        System.out.println("2. Módulo de Despesas ");
+        System.out.println("3. Módulo de Categorias ");
+        System.out.println("9. Logout (Trocar Usuário)");
+        System.out.println("0. Sair do Sistema");
+        System.out.println("==========================================");
+        System.out.print("Escolha uma opção: ");
+
+        int opcao = 0;
+        try {
+             if (scanner.hasNextInt()) {
+                opcao = scanner.nextInt();
+                scanner.nextLine();
+            } else {
+                scanner.nextLine();
+                System.out.println("Por favor, digite apenas números!");
+                return;
             }
-
-            switch (opcao) {
-                case 1:
-                   
-                    TelaRenda telaRenda = new TelaRenda();
-                    telaRenda.exibirMenu(); 
-                   
-                    break;
-                
-                case 2:
-                    TelaDespesa telaDespesa = new TelaDespesa();
-                    telaDespesa.exibirMenu();
-                    break;
-
-                case 3:
-                    TelaUsuario telaUser = new TelaUsuario();
-                    telaUser.exibirMenu();
-                    break;
-                
-                case 4:
-                    TelaCategoria telaCategoria = new TelaCategoria();
-                    telaCategoria.exibirMenu();
-                    break;
-
-                default:
-                    System.out.println(" Opção inválida!");
-            }
+        } catch (Exception e) {
+            scanner.nextLine();
+            System.out.println("Entrada inválida.");
+            return;
         }
         
-        scanner.close();
+        switch (opcao) {
+            case 1:
+                // Todas as telas agora recebem o Scanner
+               // TelaRenda telaRenda = new TelaRenda(); 
+              //  telaRenda.exibirMenu(); 
+                break;
+            
+            case 2:
+                TelaDespesa telaDespesa = new TelaDespesa();
+                telaDespesa.exibirMenu();
+                break;
+
+            case 3:
+                TelaCategoria telaCategoria = new TelaCategoria(); 
+                telaCategoria.exibirMenu();
+                break;
+                
+            case 9:
+                Sessao.deslogar();
+                System.out.println("✅ Logout realizado. Retornando à tela de acesso.");
+                break;
+
+            case 0:
+                System.out.println("Saindo... Até logo!");
+                System.exit(0);
+                break;
+
+            default:
+                System.out.println(" Opção inválida!");
+        }
     }
 }

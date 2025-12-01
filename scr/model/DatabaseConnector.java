@@ -40,18 +40,17 @@ public class DatabaseConnector {
     private static void criarTabelas(Connection conn) {
         try (Statement stmt = conn.createStatement()) {
             
-            // --- USUARIO ---
-            // MUDANÇA: id_usuario agora é TEXT PRIMARY KEY (sem AutoIncrement) para aceitar UUID
+          
             stmt.execute("CREATE TABLE IF NOT EXISTS Usuario ("
                     + "id_usuario TEXT PRIMARY KEY, " 
                     + "nome VARCHAR(255), "
                     + "email VARCHAR(255) UNIQUE, "
                     + "senha VARCHAR(255), "
-                    + "data_nascimento TEXT)"); // Alterado para TEXT para evitar problemas de data
+                    + "data_nascimento TEXT)"); 
 
             // --- CATEGORIA ---
             stmt.execute("CREATE TABLE IF NOT EXISTS Categoria ("
-                    + "idCategoria TEXT PRIMARY KEY, " // Melhor usar TEXT se for gerar UUID também
+                    + "idCategoria TEXT PRIMARY KEY, " 
                     + "idUsuario TEXT, "               // FK deve ser TEXT para bater com Usuario
                     + "nomeCategoria VARCHAR(255), "
                     + "status BOOLEAN, "

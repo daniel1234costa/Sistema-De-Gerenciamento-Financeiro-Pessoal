@@ -16,50 +16,38 @@ import model.UtilData;
 
 public class DespesaDAO {
 
-    // --- SQL Queries ---
-    // Mapeamento: nomeDespesa -> descricao | data -> data_despesa
+    // --- SQL Queries CORRIGIDAS (Nomes iguais ao Banco de Dados) ---
+    // Mapeamento corrigido: idDespesa, nomeDespesa, data, idCategoria
     private static final String SQL_INSERT = 
-        "INSERT INTO Despesa (id_despesa, id_usuario, descricao, valor, data_despesa, id_categoria) VALUES (?, ?, ?, ?, ?, ?)";
+        "INSERT INTO Despesa (idDespesa, idUsuario, nomeDespesa, valor, data, idCategoria) VALUES (?, ?, ?, ?, ?, ?)";
     
-    // Ordena por data decrescente (mais recente primeiro)
-    // O 'substr' é usado porque a data está salva como texto dd/MM/yyyy no SQLite
+    // Ordena por data (convertendo texto para data ordenável)
     private static final String SQL_SELECT_ALL_BY_USER = 
-        "SELECT * FROM Despesa WHERE id_usuario = ? ORDER BY substr(data_despesa, 7, 4) || substr(data_despesa, 4, 2) || substr(data_despesa, 1, 2) DESC";
+        "SELECT * FROM Despesa WHERE idUsuario = ? ORDER BY substr(data, 7, 4) || substr(data, 4, 2) || substr(data, 1, 2) DESC";
 
     private static final String SQL_SELECT_BY_ID = 
-        "SELECT * FROM Despesa WHERE id_despesa = ?";
+        "SELECT * FROM Despesa WHERE idDespesa = ?";
 
     private static final String SQL_UPDATE = 
-        "UPDATE Despesa SET descricao = ?, valor = ?, data_despesa = ?, id_categoria = ? WHERE id_despesa = ?";
+        "UPDATE Despesa SET nomeDespesa = ?, valor = ?, data = ?, idCategoria = ? WHERE idDespesa = ?";
 
     private static final String SQL_DELETE = 
-        "DELETE FROM Despesa WHERE id_despesa = ?";
+        "DELETE FROM Despesa WHERE idDespesa = ?";
     
-    private static final String SQL_SUM_MONTH = 
-        "SELECT SUM(valor) as total FROM Despesa WHERE id_usuario = ? AND substr(data_despesa, 4, 2) = ? AND substr(data_despesa, 7, 4) = ?";
-
-    // Query para filtrar por intervalo de datas (convertendo texto para formato comparável yyyyMMdd)
-    private static final String SQL_SELECT_BY_PERIOD = 
-        "SELECT * FROM Despesa WHERE id_usuario = ? " +
-        "AND (substr(data_despesa, 7, 4) || substr(data_despesa, 4, 2) || substr(data_despesa, 1, 2)) BETWEEN ? AND ? " +
-        "ORDER BY substr(data_despesa, 7, 4) || substr(data_despesa, 4, 2) || substr(data_despesa, 1, 2) DESC";
-
-
     // --- CADASTRAR ---
     public boolean cadastrarDespesa(Despesa despesa) {
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
             
-            // Gera UUID se não existir
             if (despesa.getIdDespesa() == null || despesa.getIdDespesa().isEmpty()) {
                 despesa.setIdDespesa(UUID.randomUUID().toString());
             }
 
             stmt.setString(1, despesa.getIdDespesa());
             stmt.setString(2, despesa.getIdUsuario());
-            stmt.setString(3, despesa.getNomeDespesa()); // Java: nomeDespesa -> Banco: descricao
+            stmt.setString(3, despesa.getNomeDespesa()); // Corrigido
             stmt.setDouble(4, despesa.getValor());
-            stmt.setString(5, UtilData.formatarData(despesa.getData())); // Java: Date -> Banco: String
+            stmt.setString(5, UtilData.formatarData(despesa.getData())); // Usa coluna 'data'
             stmt.setString(6, despesa.getIdCategoria());
 
             stmt.execute();
@@ -90,31 +78,6 @@ public class DespesaDAO {
         return lista;
     }
 
-    // --- LISTAR POR PERÍODO ---
-    public List<Despesa> listarDespesasPorPeriodo(String idUsuario, Date inicio, Date fim) {
-        List<Despesa> lista = new ArrayList<>();
-        
-        // Formata as datas Java para yyyyMMdd para bater com o SQL
-        SimpleDateFormat sdfSql = new SimpleDateFormat("yyyyMMdd");
-
-        try (Connection conn = DatabaseConnector.conectar();
-             PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_BY_PERIOD)) {
-            
-            stmt.setString(1, idUsuario);
-            stmt.setString(2, sdfSql.format(inicio));
-            stmt.setString(3, sdfSql.format(fim));
-
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                lista.add(mapResultSetToDespesa(rs));
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro ao listar por período: " + e.getMessage());
-        }
-        return lista;
-    }
-
     // --- BUSCAR POR ID ---
     public Despesa buscarPorId(String idDespesa) {
         try (Connection conn = DatabaseConnector.conectar();
@@ -141,7 +104,7 @@ public class DespesaDAO {
             stmt.setDouble(2, despesa.getValor());
             stmt.setString(3, UtilData.formatarData(despesa.getData()));
             stmt.setString(4, despesa.getIdCategoria());
-            stmt.setString(5, despesa.getIdDespesa()); // WHERE id_despesa = ?
+            stmt.setString(5, despesa.getIdDespesa());
 
             int linhas = stmt.executeUpdate();
             if (linhas > 0) {
@@ -172,50 +135,16 @@ public class DespesaDAO {
         return false;
     }
 
-    // --- VISUALIZAR ---
-    public void visualizarDespesa(String idDespesa) {
-        Despesa d = buscarPorId(idDespesa);
-        if (d != null) {
-            System.out.println("--- DETALHES DA DESPESA ---");
-            System.out.println("ID: " + d.getIdDespesa());
-            System.out.println("Descrição: " + d.getNomeDespesa());
-            System.out.println("Valor: R$ " + d.getValor());
-            System.out.println("Data: " + UtilData.formatarData(d.getData()));
-            System.out.println("Categoria: " + d.getIdCategoria());
-        } else {
-            System.out.println("⚠️ Despesa não encontrada.");
-        }
-    }
-
-    // --- CALCULAR TOTAL MENSAL ---
-    public double calcularDespesaTotalMensal(int mes, int ano, String idUsuario) {
-        double total = 0;
-        try (Connection conn = DatabaseConnector.conectar();
-             PreparedStatement stmt = conn.prepareStatement(SQL_SUM_MONTH)) {
-            
-            stmt.setString(1, idUsuario);
-            stmt.setString(2, String.format("%02d", mes)); // Garante "05" em vez de "5"
-            stmt.setString(3, String.valueOf(ano));
-            
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                total = rs.getDouble("total");
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro ao calcular total: " + e.getMessage());
-        }
-        return total;
-    }
-
-    // --- MÉTODO AUXILIAR: Converte ResultSet em Objeto Java ---
+    // --- MÉTODO AUXILIAR CORRIGIDO ---
     private Despesa mapResultSetToDespesa(ResultSet rs) throws SQLException {
         Despesa d = new Despesa();
-        d.setIdDespesa(rs.getString("id_despesa"));
-        d.setIdUsuario(rs.getString("id_usuario"));
-        d.setNomeDespesa(rs.getString("descricao")); // Pega do banco 'descricao' e põe em 'nomeDespesa'
+        // Aqui usamos os nomes exatos do DatabaseConnector
+        d.setIdDespesa(rs.getString("idDespesa"));
+        d.setIdUsuario(rs.getString("idUsuario"));
+        d.setNomeDespesa(rs.getString("nomeDespesa")); 
         d.setValor(rs.getDouble("valor"));
-        d.setData(UtilData.parseData(rs.getString("data_despesa")));
-        d.setIdCategoria(rs.getString("id_categoria"));
+        d.setData(UtilData.parseData(rs.getString("data"))); // Coluna 'data'
+        d.setIdCategoria(rs.getString("idCategoria"));
         return d;
     }
 }

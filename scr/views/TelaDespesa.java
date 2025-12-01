@@ -10,18 +10,16 @@ import model.Despesa;
 import model.Categoria;
 import model.Sessao;
 import dao.DespesaDAO;
-//import dao.CategoriaDAO;
+import dao.CategoriaDAO;
 
 public class TelaDespesa {
 
-    // Scanner próprio conforme o padrão da sua TelaUsuario
     private final Scanner scanner = new Scanner(System.in);
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public void exibirMenu() {
-        // Verifica se tem alguém logado antes de abrir o menu
         if (!Sessao.isLogado()) {
-            System.out.println("\n⚠️  ACESSO NEGADO: Você precisa fazer LOGIN no 'Módulo de Usuários' primeiro!");
+            System.out.println("\n ACESSO NEGADO: Você precisa fazer LOGIN no 'Módulo de Usuários' primeiro!");
             return;
         }
 
@@ -51,7 +49,7 @@ public class TelaDespesa {
                         cadastrarDespesa();
                         break;
                     case 2:
-                     //   listarDespesas();
+                        listarDespesas();
                         break;
                     case 3:
                         editarDespesa();
@@ -87,55 +85,54 @@ public class TelaDespesa {
         if (valor == -1) return;
 
         System.out.print("Data (dd/MM/yyyy): ");
-        Date data = lerData();
+        Date data = lerData(); // Aqui chamamos o método corrigido
         if (data == null) return;
 
-        // Pega o ID do usuário da sessão global
         String idUsuario = Sessao.getIdUsuarioLogado();
 
         Despesa novaDespesa = new Despesa(idUsuario, descricao, valor, data, idCategoria);
 
-        if (Despesa.cadastrarDespesa(novaDespesa)) {
-            // Sucesso (DAO já imprime mensagem)
+        if (new DespesaDAO().cadastrarDespesa(novaDespesa)) {
+            // Sucesso
         } else {
             System.err.println("Erro ao salvar despesa.");
         }
     }
 
-   /*  private void listarDespesas() {
+    private void listarDespesas() {
         System.out.println("\n--- MINHAS DESPESAS ---");
         String idUsuario = Sessao.getIdUsuarioLogado();
         
-        List<Despesa> lista = Despesa.listarDespesas(idUsuario);
+        DespesaDAO despesaDao = new DespesaDAO();
+        List<Despesa> lista = despesaDao.listarDespesas(idUsuario);
 
         if (lista.isEmpty()) {
             System.out.println("Nenhuma despesa encontrada.");
         } else {
-         //   CategoriaDAO catDao = new CategoriaDAO();
+            CategoriaDAO catDao = new CategoriaDAO();
             double total = 0;
 
             System.out.printf("%-36s | %-15s | %-15s | %-10s | %-12s%n", "ID", "Categoria", "Descrição", "Valor", "Data");
             System.out.println("--------------------------------------------------------------------------------------------------");
             
             for (Despesa d : lista) {
-                total += d.getValor(); */
+                total += d.getValor(); 
                 
-                // Busca nome da categoria para exibir bonito
                 String nomeCategoria = "N/D";
-              //  Categoria c = catDao.buscarPorId(d.getIdCategoria());
-             //   if (c != null) nomeCategoria = c.getNome();
+                Categoria c = catDao.buscarCategoria(d.getIdCategoria());
+                if (c != null) nomeCategoria = c.getNomeCategoria();
 
-             //   System.out.printf("%-36s | %-15s | %-15s | R$ %-7.2f | %-12s%n", 
-               //     d.getIdDespesa(), 
-               //     nomeCategoria,
-               //     d.getNomeDespesa(), 
-               //     d.getValor(), 
-              //      dateFormat.format(d.getData()));
-          //  }
-         //   System.out.println("--------------------------------------------------------------------------------------------------");
-         //   System.out.printf("TOTAL GASTO: R$ %.2f%n", total);
-       // }
-   // }
+                System.out.printf("%-36s | %-15s | %-15s | R$ %-7.2f | %-12s%n", 
+                    d.getIdDespesa(), 
+                    nomeCategoria,
+                    d.getNomeDespesa(), 
+                    d.getValor(), 
+                    dateFormat.format(d.getData()));
+            }
+            System.out.println("--------------------------------------------------------------------------------------------------");
+            System.out.printf("TOTAL GASTO: R$ %.2f%n", total);
+        }
+    }
 
     private void editarDespesa() {
         System.out.print("\nDigite o ID da despesa para editar: ");
@@ -176,22 +173,20 @@ public class TelaDespesa {
             if (novaCat != null) despesa.setIdCategoria(novaCat);
         }
 
-        // Atualiza usando o método do objeto
-        despesa.editarDespesa();
+        dao.editarDespesa(despesa);
     }
 
     private void excluirDespesa() {
         System.out.print("\nDigite o ID da despesa para excluir: ");
         String id = scanner.nextLine();
 
-        // Verificação de segurança antes de excluir
         DespesaDAO dao = new DespesaDAO();
         Despesa d = dao.buscarPorId(id);
 
         if (d != null && d.getIdUsuario().equals(Sessao.getIdUsuarioLogado())) {
             System.out.print("Tem certeza que deseja excluir? (S/N): ");
             if (scanner.nextLine().equalsIgnoreCase("S")) {
-                Despesa.excluirDespesa(id);
+                dao.excluirDespesa(id);
             }
         } else {
             System.out.println("Despesa não encontrada ou não pertence a você.");
@@ -201,18 +196,18 @@ public class TelaDespesa {
     // --- MÉTODOS AUXILIARES ---
 
     private String selecionarCategoria() {
-      //  CategoriaDAO catDao = new CategoriaDAO();
-        List<Categoria> categorias = catDao.listarCategorias(Sessao.getIdUsuarioLogado());
+        CategoriaDAO catDao = new CategoriaDAO(); 
+        List<Categoria> categorias = catDao.listarCategorias(); 
 
         if (categorias.isEmpty()) {
-            System.out.println("⚠️  ATENÇÃO: Você não tem categorias cadastradas!");
-            System.out.println("Vá ao 'Módulo de Categorias' e cadastre algumas (Ex: Alimentação, Lazer) antes de lançar despesas.");
+            System.out.println(" ATENÇÃO: Não há categorias cadastradas no sistema!");
+            System.out.println("Vá ao 'Módulo de Categorias' e cadastre algumas antes de lançar despesas.");
             return null;
         }
 
         System.out.println("\n--- CATEGORIAS DISPONÍVEIS ---");
         for (Categoria c : categorias) {
-            System.out.println("ID: " + c.getIdCategoria() + " | Nome: " + c.getNome());
+            System.out.println("ID: " + c.getIdCategoria() + " | Nome: " + c.getNomeCategoria());
         }
         System.out.print("Copie e cole o ID da categoria desejada: ");
         return scanner.nextLine();
@@ -228,11 +223,20 @@ public class TelaDespesa {
         }
     }
 
+  
     private Date lerData() {
+       
+        String entrada = scanner.nextLine();
+
+       
+        if (entrada.trim().isEmpty()) {
+            entrada = scanner.nextLine();
+        }
+
         try {
-            return dateFormat.parse(scanner.nextLine());
+            return dateFormat.parse(entrada);
         } catch (ParseException e) {
-            System.out.println("Data inválida (use dd/MM/yyyy).");
+            System.out.println("❌ Data inválida. Use o formato dd/MM/yyyy (Ex: 25/11/2025).");
             return null;
         }
     }
