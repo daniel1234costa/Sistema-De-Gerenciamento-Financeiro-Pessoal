@@ -9,7 +9,7 @@ import model.DatabaseConnector;
 public class CategoriaDAO {
 
     public boolean inserir(Categoria categoria) {
-        String sql = "INSERT INTO Categoria (idCategoria, nomeCategoria, status) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Categoria (idCategoria, nomeCategoria, status, idUsuario) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -17,6 +17,7 @@ public class CategoriaDAO {
             stmt.setString(1, categoria.getIdCategoria());
             stmt.setString(2, categoria.getNomeCategoria());
             stmt.setBoolean(3, categoria.getStatus());
+            stmt.setString(4, categoria.getIdUsuario());
 
             return stmt.executeUpdate() > 0;
 
@@ -26,19 +27,22 @@ public class CategoriaDAO {
         }
     }
 
-    public List<Categoria> listarTodos() {
+    public List<Categoria> listarCategoriasDoUsuario(String idUsuario) {
         List<Categoria> categorias = new ArrayList<>();
-        String sql = "SELECT * FROM Categoria";
+        String sql = "SELECT * FROM Categoria WHERE idUsuario = ?";
 
         try (Connection conn = DatabaseConnector.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, idUsuario);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 categorias.add(new Categoria(
                     rs.getString("idCategoria"),
                     rs.getString("nomeCategoria"),
-                    rs.getBoolean("status")
+                    rs.getBoolean("status"),
+                    rs.getString("idUsuario")
                 ));
             }
 
@@ -49,31 +53,53 @@ public class CategoriaDAO {
         return categorias;
     }
 
-    
-    public List<Categoria> listarCategorias() {
-        return listarTodos();
-    }
-   
-
-    public Categoria buscarCategoria(String nome) {
-        String sql = "SELECT * FROM Categoria WHERE nomeCategoria LIKE ?";
+    public Categoria buscarCategoriaDoUsuario(String nome, String idUsuario) {
+        String sql = "SELECT * FROM Categoria WHERE nomeCategoria = ? AND idUsuario = ?";
 
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, "%" + nome + "%");
+            stmt.setString(1, nome);
+            stmt.setString(2, idUsuario);
+
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 return new Categoria(
                     rs.getString("idCategoria"),
                     rs.getString("nomeCategoria"),
-                    rs.getBoolean("status")
+                    rs.getBoolean("status"),
+                    rs.getString("idUsuario")
                 );
             }
 
         } catch (SQLException e) {
             System.err.println("Erro ao buscar categoria: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public Categoria buscarCategoriaPorId(String idCategoria) {
+        String sql = "SELECT * FROM Categoria WHERE idCategoria = ?";
+
+        try (Connection conn = DatabaseConnector.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, idCategoria);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Categoria(
+                    rs.getString("idCategoria"),
+                    rs.getString("nomeCategoria"),
+                    rs.getBoolean("status"),
+                    rs.getString("idUsuario")
+                );
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar categoria por ID: " + e.getMessage());
         }
 
         return null;

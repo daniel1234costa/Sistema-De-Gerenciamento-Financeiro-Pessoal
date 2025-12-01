@@ -1,8 +1,10 @@
 package views;
 
+import dao.CategoriaDAO;
 import java.util.List;
 import java.util.Scanner;
 import model.Categoria;
+import model.Sessao;
 
 public class TelaCategoria {
 
@@ -15,9 +17,10 @@ public class TelaCategoria {
             System.out.println("\n====== MENU DE CATEGORIAS ======");
             System.out.println("1 - Cadastrar Categoria");
             System.out.println("2 - Listar Categorias");
-            System.out.println("3 - Buscar Categoria");
-            System.out.println("4 - Editar Categoria");
-            System.out.println("5 - Desativar Categoria");
+            System.out.println("3 - Visualizar Categoria");
+            System.out.println("4 - Buscar Categoria");
+            System.out.println("5 - Editar Categoria");
+            System.out.println("6 - Desativar Categoria");
             System.out.println("0 - Voltar");
             System.out.print("Escolha uma opção: ");
 
@@ -36,28 +39,13 @@ public class TelaCategoria {
 
             switch (opcao) {
 
-                case 1:
-                    cadastrar();
-                    break;
-
-                case 2:
-                    listar();
-                    break;
-
-                case 3:
-                    buscar();
-                    break;
-
-                case 4:
-                    editar();
-                    break;
-
-                case 5:
-                    desativar();
-                    break;
-
-                default:
-                    System.out.println("Opção inválida!");
+                case 1 -> cadastrar();
+                case 2 -> listar();
+                case 3 -> visualizarCategoria();
+                case 4 -> buscar();
+                case 5 -> editar();
+                case 6 -> desativar();
+                default -> System.out.println("Opção inválida!");
             }
         }
     }
@@ -82,6 +70,23 @@ public class TelaCategoria {
         }
     }
 
+    private void visualizarCategoria() {
+        System.out.print("Digite o ID da categoria: ");
+        String id = leitor.nextLine();
+
+        CategoriaDAO dao = new CategoriaDAO();
+        Categoria categoria = dao.buscarCategoriaPorId(id);
+
+        if (categoria == null ||
+            !categoria.getIdUsuario().equals(Sessao.getIdUsuarioLogado())) {
+
+            System.out.println("Categoria não encontrada.");
+            return;
+        }
+
+        categoria.visualizarCategoria();
+    }
+
     private void buscar() {
         System.out.print("Digite o nome da categoria para buscar: ");
         String nome = leitor.nextLine().trim();
@@ -102,7 +107,9 @@ public class TelaCategoria {
 
         Categoria cat = Categoria.buscarCategoria(nomeAtual);
 
-        if (cat == null) {
+        if (cat == null ||
+            !cat.getIdUsuario().equals(Sessao.getIdUsuarioLogado())) {
+
             System.out.println("[ERRO] Categoria não encontrada.");
             return;
         }
@@ -119,7 +126,9 @@ public class TelaCategoria {
 
         Categoria cat = Categoria.buscarCategoria(nome);
 
-        if (cat == null) {
+        if (cat == null ||
+            !cat.getIdUsuario().equals(Sessao.getIdUsuarioLogado())) {
+
             System.out.println("[ERRO] Categoria não encontrada.");
             return;
         }

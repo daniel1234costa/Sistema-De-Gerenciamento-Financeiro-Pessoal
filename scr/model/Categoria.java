@@ -5,20 +5,19 @@ import java.util.List;
 import java.util.UUID;
 
 public class Categoria {
-
+    private String idUsuario;
     private String idCategoria;
     private String nomeCategoria;
     private Boolean status;
 
     public Categoria() {}
 
-    public Categoria(String idCategoria, String nomeCategoria, Boolean status) {
+    public Categoria(String idCategoria, String nomeCategoria, Boolean status, String idUsuario) {
         this.idCategoria = idCategoria;
         this.nomeCategoria = nomeCategoria;
         this.status = status;
+        this.idUsuario = idUsuario;
     }
-
-    // ---------------- MÉTODOS ESTÁTICOS ----------------
 
     public static Categoria cadastrarCategoria(String nome) {
 
@@ -29,12 +28,18 @@ public class Categoria {
 
         CategoriaDAO dao = new CategoriaDAO();
 
-        if (dao.buscarCategoria(nome) != null) {
+        // ✅ Agora busca categoria do usuário logado
+        if (dao.buscarCategoriaDoUsuario(nome, Sessao.getIdUsuarioLogado()) != null) {
             System.out.println("[ERRO] Já existe uma categoria com esse nome!");
             return null;
         }
 
-        Categoria nova = new Categoria(UUID.randomUUID().toString(), nome, true);
+        Categoria nova = new Categoria(
+            UUID.randomUUID().toString(),
+            nome,
+            true,
+            Sessao.getIdUsuarioLogado()
+        );
 
         if (dao.inserir(nova)) {
             System.out.println("Categoria cadastrada: " + nome);
@@ -46,14 +51,12 @@ public class Categoria {
     }
 
     public static List<Categoria> listarCategorias() {
-        return new CategoriaDAO().listarTodos();
+        return new CategoriaDAO().listarCategoriasDoUsuario(Sessao.getIdUsuarioLogado());
     }
 
     public static Categoria buscarCategoria(String nome) {
-        return new CategoriaDAO().buscarCategoria(nome);
+        return new CategoriaDAO().buscarCategoriaDoUsuario(nome, Sessao.getIdUsuarioLogado());
     }
-
-    // ---------------- MÉTODOS DE INSTÂNCIA ----------------
 
     public Categoria editarCategoria(String novoNome) {
 
@@ -69,7 +72,7 @@ public class Categoria {
 
         CategoriaDAO dao = new CategoriaDAO();
 
-        if (dao.buscarCategoria(novoNome) != null) {
+        if (dao.buscarCategoriaDoUsuario(novoNome, this.idUsuario) != null) {
             System.out.println("[ERRO] Já existe outra categoria com esse nome!");
             return null;
         }
@@ -105,12 +108,14 @@ public class Categoria {
 
     public void visualizarCategoria() {
         System.out.println("\n--- Categoria ---");
-        System.out.println("ID: " + idCategoria);
-        System.out.println("Nome: " + nomeCategoria);
-        System.out.println("Status: " + (status ? "ATIVA" : "INATIVA"));
+        System.out.println("ID: " + this.idCategoria);
+        System.out.println("Nome: " + this.nomeCategoria);
+        System.out.println("Status: " + (this.status ? "ATIVA" : "INATIVA"));
+        System.out.println("---------------------------");
     }
 
     public String getIdCategoria() { return idCategoria; }
     public String getNomeCategoria() { return nomeCategoria; }
     public Boolean getStatus() { return status; }
+    public String getIdUsuario() { return idUsuario; }
 }
