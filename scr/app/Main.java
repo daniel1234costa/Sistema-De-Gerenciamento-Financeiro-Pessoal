@@ -109,6 +109,7 @@ public class Main {
             case 1:
            // Todas as telas agora recebem o Scanner
                 TelaRenda telaRenda = new TelaRenda(); 
+                
                 telaRenda.exibirMenu(); 
                 break;
             
