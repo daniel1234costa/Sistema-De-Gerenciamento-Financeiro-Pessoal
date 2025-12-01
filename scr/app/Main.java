@@ -12,10 +12,10 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
-        // Loop infinito principal da aplicação
+       
         while (true) {
             
-            // Verifica se existe usuário na sessão
+           
             if (!Sessao.isLogado()) {
                 exibirMenuAcesso(scanner);
             } else {
@@ -24,7 +24,7 @@ public class Main {
         } 
     }
 
-    // MENU PARA QUEM NÃO ESTÁ LOGADO
+    
     private static void exibirMenuAcesso(Scanner scanner) {
         System.out.println("\n==========================================");
         System.out.println("     SISTEMA DE FINANÇAS PESSOAIS");
@@ -39,7 +39,7 @@ public class Main {
         try {
             if (scanner.hasNextInt()) {
                 opcao = scanner.nextInt();
-                scanner.nextLine(); // Consumir o \n
+                scanner.nextLine();
             } else {
                 scanner.nextLine();
                 System.out.println("Por favor, digite apenas números!");
@@ -55,7 +55,7 @@ public class Main {
             case 1:
                 TelaUsuario telaLogin = new TelaUsuario(scanner);
                 String idLogado = telaLogin.exibirMenuLogin(); 
-                // Se o login foi sucesso, salva na sessão
+              
                 if (idLogado != null) {
                     Sessao.logar(idLogado);
                 }
@@ -73,9 +73,9 @@ public class Main {
         }
     }
     
-    // MENU PARA QUEM JÁ ESTÁ LOGADO
+   
     private static void exibirMenuPrincipal(Scanner scanner) {
-        // Exibe 8 primeiros caracteres do ID apenas para debug visual
+       
         String idDisplay = (Sessao.getIdUsuarioLogado().length() > 8) 
             ? Sessao.getIdUsuarioLogado().substring(0, 8) + "..." 
             : Sessao.getIdUsuarioLogado();
@@ -86,7 +86,7 @@ public class Main {
         System.out.println("1. Módulo de Rendas ");
         System.out.println("2. Módulo de Despesas ");
         System.out.println("3. Módulo de Categorias ");
-        System.out.println("4. Meu Perfil (Visualizar / Editar / Excluir) "); // Nova opção
+        System.out.println("4. Meu Perfil");
         System.out.println("9. Logout (Trocar Usuário)");
         System.out.println("0. Sair do Sistema");
         System.out.println("==========================================");
@@ -124,7 +124,7 @@ public class Main {
                 telaCategoria.exibirMenu();
                 break;
             
-            // --- NOVO SUB-MENU DE PERFIL ---
+          
             case 4: 
                 TelaUsuario telaUsuario = new TelaUsuario(scanner);
                 telaUsuario.exibirMenuPerfil();

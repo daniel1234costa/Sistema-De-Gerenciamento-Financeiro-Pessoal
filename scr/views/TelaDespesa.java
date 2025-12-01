@@ -28,15 +28,18 @@ public class TelaDespesa {
         while (opcao != 0) {
             System.out.println("\n--- GESTÃO DE DESPESAS ---");
             System.out.println("1. Cadastrar Nova Despesa");
-            System.out.println("2. Listar Minhas Despesas");
-            System.out.println("3. Editar Despesa");
-            System.out.println("4. Excluir Despesa");
+            System.out.println("2. Listar TODAS Minhas Despesas");
+            System.out.println("3. Listar Despesas por Categoria "); 
+            System.out.println("4. Calcular Total Mensal "); 
+            System.out.println("5. Buscar Despesa por ID "); 
+            System.out.println("6. Editar Despesa");
+            System.out.println("7. Excluir Despesa");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
 
             if (scanner.hasNextInt()) {
                 opcao = scanner.nextInt();
-                scanner.nextLine(); // Consumir quebra de linha
+                scanner.nextLine(); 
             } else {
                 System.out.println("Opção inválida. Digite um número.");
                 scanner.nextLine();
@@ -49,13 +52,22 @@ public class TelaDespesa {
                         cadastrarDespesa();
                         break;
                     case 2:
-                        listarDespesas();
+                        listarTodasDespesas(); 
                         break;
                     case 3:
-                        editarDespesa();
+                        listarDespesasPorCategoria(); 
                         break;
                     case 4:
-                        excluirDespesa();
+                        calcularTotalMensal();
+                        break;
+                    case 5:
+                        buscarDespesaPorId(); 
+                        break;
+                    case 6:
+                        editarDespesa(); 
+                        break;
+                    case 7:
+                        excluirDespesa(); 
                         break;
                     case 0:
                         System.out.println("Voltando ao menu principal...");
@@ -65,7 +77,7 @@ public class TelaDespesa {
                 }
             } catch (Exception e) {
                 System.err.println("Erro na operação: " + e.getMessage());
-                e.printStackTrace();
+             
             }
         }
     }
@@ -73,7 +85,6 @@ public class TelaDespesa {
     private void cadastrarDespesa() {
         System.out.println("\n--- CADASTRAR DESPESA ---");
 
-        
         String idCategoria = selecionarCategoria();
         if (idCategoria == null) return; 
 
@@ -92,19 +103,19 @@ public class TelaDespesa {
 
         Despesa novaDespesa = new Despesa(idUsuario, descricao, valor, data, idCategoria);
 
-        if (new DespesaDAO().cadastrarDespesa(novaDespesa)) {
-      
+        if (Despesa.cadastrarDespesa(novaDespesa)) {
+           
         } else {
             System.err.println("Erro ao salvar despesa.");
         }
     }
 
-    private void listarDespesas() {
-        System.out.println("\n--- MINHAS DESPESAS ---");
+   
+    private void listarTodasDespesas() {
+        System.out.println("\n--- MINHAS DESPESAS (Todas) ---");
         String idUsuario = Sessao.getIdUsuarioLogado();
         
-        DespesaDAO despesaDao = new DespesaDAO();
-        List<Despesa> lista = despesaDao.listarDespesas(idUsuario);
+        List<Despesa> lista = Despesa.listarDespesas(idUsuario); 
 
         if (lista.isEmpty()) {
             System.out.println("Nenhuma despesa encontrada.");
@@ -133,13 +144,92 @@ public class TelaDespesa {
             System.out.printf("TOTAL GASTO: R$ %.2f%n", total);
         }
     }
+    
+
+    private void listarDespesasPorCategoria() {
+        System.out.println("\n--- LISTAR POR CATEGORIA ---");
+        
+        String idCategoria = selecionarCategoria();
+        if (idCategoria == null) return;
+        
+        List<Despesa> lista = Despesa.listarDespesasPorCategoria(idCategoria); 
+
+        if (lista.isEmpty()) {
+            System.out.println("Nenhuma despesa encontrada para esta categoria.");
+        } else {
+            CategoriaDAO catDao = new CategoriaDAO();
+            String nomeCategoria = catDao.buscarCategoria(idCategoria) != null ? catDao.buscarCategoria(idCategoria).getNomeCategoria() : idCategoria;
+
+            System.out.printf("%n--- DESPESAS NA CATEGORIA: %s ---%n", nomeCategoria);
+            System.out.printf("%-36s | %-15s | %-10s | %-12s%n", "ID", "Descrição", "Valor", "Data");
+            System.out.println("------------------------------------------------------------------");
+            double total = 0;
+            for (Despesa d : lista) {
+                total += d.getValor(); 
+                System.out.printf("%-36s | %-15s | R$ %-7.2f | %-12s%n", 
+                    d.getIdDespesa(), 
+                    d.getNomeDespesa(), 
+                    d.getValor(), 
+                    dateFormat.format(d.getData()));
+            }
+            System.out.println("------------------------------------------------------------------");
+            System.out.printf("TOTAL GASTO NESSA CATEGORIA: R$ %.2f%n", total);
+        }
+    }
+
+    private void buscarDespesaPorId() {
+        System.out.print("\nDigite o ID da despesa para buscar: ");
+        String id = scanner.nextLine();
+
+        Despesa d = Despesa.buscarDespesaPorId(id);
+
+        if (d == null || !d.getIdUsuario().equals(Sessao.getIdUsuarioLogado())) {
+            System.out.println("Despesa não encontrada ou acesso negado.");
+            return;
+        }
+        
+        
+        System.out.println("\n--- DETALHES DA DESPESA ---");
+        System.out.println("ID: " + d.getIdDespesa());
+        System.out.println("Nome: " + d.getNomeDespesa());
+        System.out.println("Valor: R$ " + String.format("%.2f", d.getValor()));
+        System.out.println("Data: " + dateFormat.format(d.getData()));
+        
+       
+        Categoria categoria = new CategoriaDAO().buscarCategoria(d.getIdCategoria());
+        if (categoria != null) {
+            System.out.println("Categoria: " + categoria.getNomeCategoria());
+        } else {
+             System.out.println("Categoria: " + d.getIdCategoria() + " (N/D)");
+        }
+    }
+
+   
+    private void calcularTotalMensal() {
+        System.out.println("\n--- CÁLCULO DE DESPESA MENSAL ---");
+        
+        System.out.print("Digite o Mês (1 a 12): ");
+        int mes = lerInt();
+        if (mes == -1 || mes < 1 || mes > 12) { return; }
+        
+        System.out.print("Digite o Ano (Ex: 2025): ");
+        int ano = lerInt();
+        if (ano == -1 || ano < 1900) { return; }
+
+        
+        String idUsuario = Sessao.getIdUsuarioLogado();
+        
+        double total = Despesa.calcularDespesaTotalMensal(mes, ano, idUsuario); 
+
+        System.out.printf("\n Total de Despesas em %02d/%d: R$ %.2f%n", mes, ano, total);
+    }
+
 
     private void editarDespesa() {
         System.out.print("\nDigite o ID da despesa para editar: ");
         String id = scanner.nextLine();
 
-        DespesaDAO dao = new DespesaDAO();
-        Despesa despesa = dao.buscarPorId(id);
+        Despesa despesa = Despesa.buscarDespesaPorId(id);
 
         if (despesa == null) {
             System.out.println("Despesa não encontrada.");
@@ -173,27 +263,25 @@ public class TelaDespesa {
             if (novaCat != null) despesa.setIdCategoria(novaCat);
         }
 
-        dao.editarDespesa(despesa);
+        despesa.editarDespesa(); // Chama o método de instância
     }
 
     private void excluirDespesa() {
         System.out.print("\nDigite o ID da despesa para excluir: ");
         String id = scanner.nextLine();
 
-        DespesaDAO dao = new DespesaDAO();
-        Despesa d = dao.buscarPorId(id);
+        Despesa d = Despesa.buscarDespesaPorId(id);
 
         if (d != null && d.getIdUsuario().equals(Sessao.getIdUsuarioLogado())) {
             System.out.print("Tem certeza que deseja excluir? (S/N): ");
             if (scanner.nextLine().equalsIgnoreCase("S")) {
-                dao.excluirDespesa(id);
+                Despesa.excluirDespesa(id); 
             }
         } else {
             System.out.println("Despesa não encontrada ou não pertence a você.");
         }
     }
 
-   
 
     private String selecionarCategoria() {
         CategoriaDAO catDao = new CategoriaDAO(); 
@@ -223,12 +311,22 @@ public class TelaDespesa {
         }
     }
 
-  
+    private int lerInt() {
+        while (!scanner.hasNextInt()) {
+            System.out.println("Entrada inválida. Digite um número inteiro.");
+            scanner.next(); // consome a entrada inválida
+        }
+        int num = scanner.nextInt();
+        scanner.nextLine(); // Consumir quebra de linha
+        return num;
+    }
+
+    
     private Date lerData() {
-       
+        
         String entrada = scanner.nextLine();
 
-       
+        
         if (entrada.trim().isEmpty()) {
             entrada = scanner.nextLine();
         }

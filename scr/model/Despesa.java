@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import dao.DespesaDAO;
@@ -9,11 +10,11 @@ public class Despesa {
     private String idDespesa;
     private String nomeDespesa; 
     private double valor;
-    private Date data;          
+    private Date data; 
     private String idUsuario; 
     private String idCategoria;
 
-   
+    
     public Despesa() {
     }
 
@@ -25,55 +26,69 @@ public class Despesa {
         this.idCategoria = idCategoria;
     }
 
-   
+    
     public static boolean cadastrarDespesa(Despesa despesa) {
         DespesaDAO dao = new DespesaDAO();
         return dao.cadastrarDespesa(despesa);
     }
 
-    // Excluir (Static no diagrama)
     public static boolean excluirDespesa(String idDespesa) {
         DespesaDAO dao = new DespesaDAO();
         return dao.excluirDespesa(idDespesa);
     }
 
-    // Listar (Static no diagrama) - Adicionamos idUsuario para filtrar
+    
     public static List<Despesa> listarDespesas(String idUsuario) {
         DespesaDAO dao = new DespesaDAO();
         return dao.listarDespesas(idUsuario);
     }
 
+   
     public static List<Despesa> listarDespesasPorPeriodo(Date inicio, Date fim, String idUsuario) {
         DespesaDAO dao = new DespesaDAO();
         return dao.listarDespesasPorPeriodo(idUsuario, inicio, fim);
     }
-
+    
+  
+    public static List<Despesa> listarDespesasPorCategoria(String idCategoria) {
    
+        if (Sessao.getIdUsuarioLogado() == null) {
+            System.out.println("Erro: Nenhum usuário logado.");
+            return new ArrayList<>();
+        }
+        DespesaDAO dao = new DespesaDAO();
+        return dao.listarDespesasPorCategoria(Sessao.getIdUsuarioLogado(), idCategoria);
+    }
+    
+  
+    public static Despesa buscarDespesaPorId(String idDespesa) {
+        DespesaDAO dao = new DespesaDAO();
+        return dao.buscarPorId(idDespesa);
+    }
+
+    
     public static double calcularDespesaTotalMensal(int mes, int ano, String idUsuario) {
         DespesaDAO dao = new DespesaDAO();
         return dao.calcularDespesaTotalMensal(mes, ano, idUsuario);
     }
 
-   
+    
     public void editarDespesa() {
         DespesaDAO dao = new DespesaDAO();
-        // O DAO pega o ID deste objeto e atualiza no banco
         dao.editarDespesa(this);
     }
 
-    // Visualizar (Usa o ID do próprio objeto)
     public void visualizarDespesa() {
         DespesaDAO dao = new DespesaDAO();
         dao.visualizarDespesa(this.idDespesa);
     }
 
-  
-
+   
     public String getIdDespesa() {
-         return idDespesa;
-         }
+          return idDespesa;
+          }
     public void setIdDespesa(String idDespesa) {
-         this.idDespesa = idDespesa; 
+          this.idDespesa = idDespesa; 
         }
 
     public String getNomeDespesa() { 

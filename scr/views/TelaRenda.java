@@ -63,20 +63,20 @@ public class TelaRenda {
         boolean tipo = scanner.nextBoolean();
         scanner.nextLine();
 
-        // CHAMA DIRETO O MODEL (Static)
+       
         Renda.cadastrarRenda(nome, valor, data, tipo);
     }
 
     private void listarExtras() {
         System.out.println("\n--- EXTRAS ---");
-        // CHAMA DIRETO O MODEL
+       
         List<Renda> lista = Renda.listarRendasExtras();
         for (Renda r : lista) System.out.println(r.getIdRenda() + " | " + r.getNomeRenda() + " | R$ " + r.getValor());
     }
 
     private void listarFixas() {
         System.out.println("\n--- FIXAS ---");
-        // CHAMA DIRETO O MODEL
+       
         List<Renda> lista = Renda.listarRendasFixas();
         for (Renda r : lista) System.out.println(r.getIdRenda() + " | " + r.getNomeRenda() + " | R$ " + r.getValor());
     }
@@ -90,7 +90,7 @@ public class TelaRenda {
         System.out.print("Novo Valor: ");
         double valor = scanner.nextDouble();
         
-        // Cria objeto temporário e chama método de instância do Model
+       
         Renda r = new Renda();
         r.setIdRenda(id);
         r.editarRenda(nome, valor);
@@ -102,7 +102,7 @@ public class TelaRenda {
         Renda rendaParaExcluir = new Renda();
         rendaParaExcluir.setIdRenda(id);
         
-        // Agora chama passando o Objeto, conforme o diagrama manda
+       
         boolean sucesso = Renda.excluirRenda(rendaParaExcluir);
         if (sucesso) System.out.println(" Renda excluída!");
         else System.out.println(" Erro ao excluir.");
@@ -121,7 +121,7 @@ public class TelaRenda {
             return;
         }
 
-        // 2. Mostra a lista numerada
+       
         for (int i = 0; i < todas.size(); i++) {
             System.out.println((i + 1) + ". " + todas.get(i).getNomeRenda() + " (R$ " + todas.get(i).getValor() + ")");
         }
@@ -131,10 +131,10 @@ public class TelaRenda {
         scanner.nextLine(); 
 
         if (opcao > 0 && opcao <= todas.size()) {
-            // 3. Pega o objeto da lista
+          
             Renda rendaSelecionada = todas.get(opcao - 1);
             
-            // 4. Chama o método de instância direto do objeto (ele já tem o ID dentro dele)
+           
             rendaSelecionada.visualizarRenda();
         } else {
             System.out.println("Opção inválida!");
@@ -146,7 +146,7 @@ public class TelaRenda {
         int mes = scanner.nextInt();
         System.out.print("Ano: ");
         int ano = scanner.nextInt();
-        // CHAMA DIRETO O MODEL
+       
         System.out.println("Total: R$ " + Renda.calcularRendaTotalMensal(mes, ano));
     }
 }

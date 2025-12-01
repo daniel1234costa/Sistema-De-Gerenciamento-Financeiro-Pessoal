@@ -145,7 +145,7 @@ public class TelaUsuario {
                     System.out.println("Conta excluída com sucesso.");
                     System.out.println("Você será deslogado agora.");
                     
-                    /
+                    
                     Sessao.deslogar();
                     return true; 
                 } else {
