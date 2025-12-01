@@ -1,65 +1,116 @@
 package model;
 
-import java.util.List;
 import dao.CategoriaDAO;
+import java.util.List;
+import java.util.UUID;
 
 public class Categoria {
+
     private String idCategoria;
     private String nomeCategoria;
-    private boolean status;
+    private Boolean status;
 
     public Categoria() {}
 
-    public Categoria(String nomeCategoria, boolean status) {
+    public Categoria(String idCategoria, String nomeCategoria, Boolean status) {
+        this.idCategoria = idCategoria;
         this.nomeCategoria = nomeCategoria;
         this.status = status;
     }
 
-    // --- MÉTODOS ESTÁTICOS ---
+    // ---------------- MÉTODOS ESTÁTICOS ----------------
 
     public static Categoria cadastrarCategoria(String nome) {
-        if (nome == null || nome.isEmpty()) {
-            System.out.println("Nome obrigatório.");
+
+        if (nome == null || nome.trim().isEmpty()) {
+            System.out.println("[ERRO] O nome não pode ser vazio.");
             return null;
         }
-        Categoria nova = new Categoria(nome, true);
-        new CategoriaDAO().cadastrarCategoria(nova);
-        return nova;
+
+        CategoriaDAO dao = new CategoriaDAO();
+
+        if (dao.buscarCategoria(nome) != null) {
+            System.out.println("[ERRO] Já existe uma categoria com esse nome!");
+            return null;
+        }
+
+        Categoria nova = new Categoria(UUID.randomUUID().toString(), nome, true);
+
+        if (dao.inserir(nova)) {
+            System.out.println("Categoria cadastrada: " + nome);
+            return nova;
+        }
+
+        System.out.println("[ERRO] Falha ao salvar no banco.");
+        return null;
     }
 
     public static List<Categoria> listarCategorias() {
-        return new CategoriaDAO().listarCategorias();
+        return new CategoriaDAO().listarTodos();
     }
 
-    public static Categoria buscarCategoria(String termo) {
-        return new CategoriaDAO().buscarCategoria(termo);
+    public static Categoria buscarCategoria(String nome) {
+        return new CategoriaDAO().buscarCategoria(nome);
     }
 
-    // --- MÉTODOS DE INSTÂNCIA ---
+    // ---------------- MÉTODOS DE INSTÂNCIA ----------------
 
-    public void editarCategoria(String novoNome) {
-        if (novoNome == null || novoNome.isEmpty()) return;
-        new CategoriaDAO().editarCategoria(this.idCategoria, novoNome);
-        this.nomeCategoria = novoNome; // Atualiza localmente também
+    public Categoria editarCategoria(String novoNome) {
+
+        if (novoNome == null || novoNome.trim().isEmpty()) {
+            System.out.println("[ERRO] O novo nome não pode ser vazio.");
+            return null;
+        }
+
+        if (!this.status) {
+            System.out.println("[ERRO] Categoria desativada NÃO pode ser editada.");
+            return null;
+        }
+
+        CategoriaDAO dao = new CategoriaDAO();
+
+        if (dao.buscarCategoria(novoNome) != null) {
+            System.out.println("[ERRO] Já existe outra categoria com esse nome!");
+            return null;
+        }
+
+        this.nomeCategoria = novoNome;
+
+        if (dao.atualizar(this)) {
+            System.out.println("Categoria atualizada para: " + novoNome);
+            return this;
+        }
+
+        System.out.println("[ERRO] Falha ao atualizar categoria.");
+        return null;
     }
 
     public boolean desativarCategoria() {
-        boolean sucesso = new CategoriaDAO().desativarCategoria(this.idCategoria);
-        if (sucesso) this.status = false;
-        return sucesso;
+
+        if (!this.status) {
+            System.out.println("[ERRO] Categoria já está desativada.");
+            return false;
+        }
+
+        this.status = false;
+
+        if (new CategoriaDAO().atualizar(this)) {
+            System.out.println("Categoria desativada: " + nomeCategoria);
+            return true;
+        }
+
+        System.out.println("[ERRO] Falha ao desativar categoria.");
+        return false;
     }
 
     public void visualizarCategoria() {
-        new CategoriaDAO().visualizarCategoria(this.idCategoria);
+        System.out.println("\n--- Categoria ---");
+        System.out.println("ID: " + idCategoria);
+        System.out.println("Nome: " + nomeCategoria);
+        System.out.println("Status: " + (status ? "ATIVA" : "INATIVA"));
     }
 
-    // Getters e Setters
     public String getIdCategoria() { return idCategoria; }
-    public void setIdCategoria(String idCategoria) { this.idCategoria = idCategoria; }
     public String getNomeCategoria() { return nomeCategoria; }
-    public void setNomeCategoria(String nomeCategoria) { this.nomeCategoria = nomeCategoria; }
-    public boolean isStatus() { return status; }
-    public void setStatus(boolean status) { this.status = status; }
-    
-    public String getStatusDescricao() { return status ? "Ativa" : "Desativada"; }
+    public Boolean getStatus() { return status; }
 }
