@@ -36,12 +36,10 @@ public class Renda {
         return dao.cadastrarRenda(nome, valor, data, tipo);
     }
 
-    public static boolean excluirRenda(String id) {
-        Renda temp = new Renda();
-        temp.setIdRenda(id);
-        
+    public static boolean excluirRenda(Renda renda) {
+       
         RendaDAO dao = new RendaDAO();
-        return dao.excluirRenda(temp);
+        return dao.excluirRenda(renda);
     }
 
     public static List<Renda> listarRendasExtras() {

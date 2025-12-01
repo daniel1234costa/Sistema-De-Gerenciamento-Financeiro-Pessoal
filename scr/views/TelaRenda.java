@@ -98,9 +98,13 @@ public class TelaRenda {
     private void excluir() {
         System.out.print("ID para excluir: ");
         String id = scanner.next();
+        Renda rendaParaExcluir = new Renda();
+        rendaParaExcluir.setIdRenda(id);
         
-        // Excluir é estático no Model (conforme diagrama) e recebe ID
-        Renda.excluirRenda(id);
+        // Agora chama passando o Objeto, conforme o diagrama manda
+        boolean sucesso = Renda.excluirRenda(rendaParaExcluir);
+        if (sucesso) System.out.println(" Renda excluída!");
+        else System.out.println(" Erro ao excluir.");
     }
 
     private void visualizar() {
