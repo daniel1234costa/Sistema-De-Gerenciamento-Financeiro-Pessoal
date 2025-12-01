@@ -7,13 +7,13 @@ import dao.DespesaDAO;
 public class Despesa {
 
     private String idDespesa;
-    private String nomeDespesa; // No banco é salvo na coluna 'descricao'
+    private String nomeDespesa; 
     private double valor;
-    private Date data;          // No banco é salvo na coluna 'data_despesa'
-    private String idUsuario;   // Chave Estrangeira
-    private String idCategoria; // Chave Estrangeira
+    private Date data;          
+    private String idUsuario; 
+    private String idCategoria;
 
-    // --- CONSTRUTORES ---
+   
     public Despesa() {
     }
 
@@ -25,11 +25,7 @@ public class Despesa {
         this.idCategoria = idCategoria;
     }
 
-    // ====================================================================
-    // === MÉTODOS ESTÁTICOS (Operações Gerais / Sublinhados no Diagrama) ==
-    // ====================================================================
-
-    // Cadastrar (Static no diagrama)
+   
     public static boolean cadastrarDespesa(Despesa despesa) {
         DespesaDAO dao = new DespesaDAO();
         return dao.cadastrarDespesa(despesa);
@@ -47,23 +43,18 @@ public class Despesa {
         return dao.listarDespesas(idUsuario);
     }
 
-    // Método extra que você pediu: Listar por período
     public static List<Despesa> listarDespesasPorPeriodo(Date inicio, Date fim, String idUsuario) {
         DespesaDAO dao = new DespesaDAO();
         return dao.listarDespesasPorPeriodo(idUsuario, inicio, fim);
     }
 
-    // Calcular Total (Static no diagrama)
+   
     public static double calcularDespesaTotalMensal(int mes, int ano, String idUsuario) {
         DespesaDAO dao = new DespesaDAO();
         return dao.calcularDespesaTotalMensal(mes, ano, idUsuario);
     }
 
-    // ====================================================================
-    // === MÉTODOS DE INSTÂNCIA (Operações no Objeto / Não sublinhados) ===
-    // ====================================================================
-
-    // Editar (Usa os dados do próprio objeto 'this')
+   
     public void editarDespesa() {
         DespesaDAO dao = new DespesaDAO();
         // O DAO pega o ID deste objeto e atualiza no banco
@@ -76,9 +67,7 @@ public class Despesa {
         dao.visualizarDespesa(this.idDespesa);
     }
 
-    // ====================================================================
-    // === GETTERS E SETTERS ==============================================
-    // ====================================================================
+  
 
     public String getIdDespesa() {
          return idDespesa;
