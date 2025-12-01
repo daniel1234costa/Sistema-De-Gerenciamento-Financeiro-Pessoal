@@ -73,9 +73,9 @@ public class TelaDespesa {
     private void cadastrarDespesa() {
         System.out.println("\n--- CADASTRAR DESPESA ---");
 
-        // 1. Selecionar Categoria (Obrigatório)
+        
         String idCategoria = selecionarCategoria();
-        if (idCategoria == null) return; // Cancela se não tiver categoria
+        if (idCategoria == null) return; 
 
         System.out.print("Descrição da Despesa: ");
         String descricao = scanner.nextLine();
@@ -85,7 +85,7 @@ public class TelaDespesa {
         if (valor == -1) return;
 
         System.out.print("Data (dd/MM/yyyy): ");
-        Date data = lerData(); // Aqui chamamos o método corrigido
+        Date data = lerData();
         if (data == null) return;
 
         String idUsuario = Sessao.getIdUsuarioLogado();
@@ -93,7 +93,7 @@ public class TelaDespesa {
         Despesa novaDespesa = new Despesa(idUsuario, descricao, valor, data, idCategoria);
 
         if (new DespesaDAO().cadastrarDespesa(novaDespesa)) {
-            // Sucesso
+      
         } else {
             System.err.println("Erro ao salvar despesa.");
         }
@@ -193,7 +193,7 @@ public class TelaDespesa {
         }
     }
 
-    // --- MÉTODOS AUXILIARES ---
+   
 
     private String selecionarCategoria() {
         CategoriaDAO catDao = new CategoriaDAO(); 
@@ -236,7 +236,7 @@ public class TelaDespesa {
         try {
             return dateFormat.parse(entrada);
         } catch (ParseException e) {
-            System.out.println("❌ Data inválida. Use o formato dd/MM/yyyy (Ex: 25/11/2025).");
+            System.out.println("Data inválida. Use o formato dd/MM/yyyy (Ex: 25/11/2025).");
             return null;
         }
     }

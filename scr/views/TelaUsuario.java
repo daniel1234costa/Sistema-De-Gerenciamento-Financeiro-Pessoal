@@ -11,36 +11,24 @@ import java.util.Locale;
 public class TelaUsuario {
 
     private final Scanner scanner;
-    // O dateFormat é mantido, mas é recomendado usar UtilData.parseData/formatarData
+    
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
 
-    // --- CONSTRUTOR CORRIGIDO ---
+    
     public TelaUsuario(Scanner scanner) {
         this.scanner = scanner;
     }
 
-    // ==========================================================
-    // === MÉTODOS REQUERIDOS PELO MAIN (INTERFACE) =============
-    // ==========================================================
-
-    /**
-     * Implementa o login e retorna o ID do usuário para a Sessão.
-     */
+    
     public String exibirMenuLogin() {
         Usuario usuario = realizarLogin();
         return (usuario != null) ? usuario.getIdUsuario() : null; 
     }
 
-    /**
-     * Permite o cadastro de um novo usuário.
-     */
+   
     public void exibirMenuCadastro() {
         cadastrarUsuario();
     }
-
-    // ==========================================================
-    // === MÉTODOS AUXILIARES PRIVADOS (Lógica original do Menu) ==
-    // ==========================================================
 
     private void cadastrarUsuario() {
         System.out.print("Nome: ");
@@ -55,14 +43,14 @@ public class TelaUsuario {
         try {
             Date dataNascimento = dateFormat.parse(dataStr);
             
-            // Garanta que esta chamada (registrarUsuario) existe na sua classe Usuario/DAO
+           
             boolean sucesso = Usuario.registrarUsuario(nome, email, senha, dataNascimento);
             
-            if (sucesso) System.out.println("✅ Usuário registrado com sucesso!");
-            else System.err.println("⚠️ Falha ao registrar. Email pode já existir.");
+            if (sucesso) System.out.println("Usuário registrado com sucesso!");
+            else System.err.println("Falha ao registrar. Email pode já existir.");
             
         } catch (ParseException e) {
-            System.err.println("⚠️ Data inválida. Use o formato dd/MM/yyyy.");
+            System.err.println("Data inválida. Use o formato dd/MM/yyyy.");
         }
     }
 
@@ -75,11 +63,9 @@ public class TelaUsuario {
         Usuario usuarioLogado = Usuario.login(email, senha);
         
         if (usuarioLogado == null) {
-            System.err.println("❌ Login falhou. Email ou senha incorretos.");
+            System.err.println(" Login falhou. Email ou senha incorretos.");
         }
         return usuarioLogado;
     }
 
-    // Mantenha os métodos: editarPerfil e excluirConta.
-    // ... (restante do código: editarPerfil e excluirConta) ...
 }

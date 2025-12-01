@@ -20,15 +20,12 @@ public class Main {
                 exibirMenuPrincipal(scanner);
             }
             
-            // Loop continua até que System.exit(0) seja chamado
+           
         } 
         
-        // scanner.close(); // Não alcançável devido ao System.exit(0)
+       
     }
-    
-    // ==========================================================
-    // === MÉTODOS DE MENU ======================================
-    // ==========================================================
+
 
     private static void exibirMenuAcesso(Scanner scanner) {
         System.out.println("\n==========================================");
@@ -107,9 +104,7 @@ public class Main {
         
         switch (opcao) {
             case 1:
-           // Todas as telas agora recebem o Scanner
                 TelaRenda telaRenda = new TelaRenda(); 
-                
                 telaRenda.exibirMenu(); 
                 break;
             
@@ -125,7 +120,7 @@ public class Main {
                 
             case 9:
                 Sessao.deslogar();
-                System.out.println("✅ Logout realizado. Retornando à tela de acesso.");
+                System.out.println("Logout realizado. Retornando à tela de acesso.");
                 break;
 
             case 0:

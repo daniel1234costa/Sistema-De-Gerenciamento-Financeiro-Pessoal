@@ -16,12 +16,11 @@ import model.UtilData;
 
 public class DespesaDAO {
 
-    // --- SQL Queries CORRIGIDAS (Nomes iguais ao Banco de Dados) ---
-    // Mapeamento corrigido: idDespesa, nomeDespesa, data, idCategoria
+  
     private static final String SQL_INSERT = 
         "INSERT INTO Despesa (idDespesa, idUsuario, nomeDespesa, valor, data, idCategoria) VALUES (?, ?, ?, ?, ?, ?)";
     
-    // Ordena por data (convertendo texto para data ordenável)
+   
     private static final String SQL_SELECT_ALL_BY_USER = 
         "SELECT * FROM Despesa WHERE idUsuario = ? ORDER BY substr(data, 7, 4) || substr(data, 4, 2) || substr(data, 1, 2) DESC";
 
@@ -138,12 +137,12 @@ public class DespesaDAO {
     // --- MÉTODO AUXILIAR CORRIGIDO ---
     private Despesa mapResultSetToDespesa(ResultSet rs) throws SQLException {
         Despesa d = new Despesa();
-        // Aqui usamos os nomes exatos do DatabaseConnector
+     
         d.setIdDespesa(rs.getString("idDespesa"));
         d.setIdUsuario(rs.getString("idUsuario"));
         d.setNomeDespesa(rs.getString("nomeDespesa")); 
         d.setValor(rs.getDouble("valor"));
-        d.setData(UtilData.parseData(rs.getString("data"))); // Coluna 'data'
+        d.setData(UtilData.parseData(rs.getString("data"))); 
         d.setIdCategoria(rs.getString("idCategoria"));
         return d;
     }
