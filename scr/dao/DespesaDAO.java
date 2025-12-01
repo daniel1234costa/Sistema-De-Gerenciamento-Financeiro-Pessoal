@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import model.Categoria;
 import model.DatabaseConnector;
 import model.Despesa;
 import model.UtilData;
@@ -16,31 +17,49 @@ public class DespesaDAO {
         "INSERT INTO Despesa (idDespesa, idUsuario, nomeDespesa, valor, data, idCategoria) VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_SELECT_ALL_BY_USER =
-        "SELECT * FROM Despesa WHERE idUsuario = ? ORDER BY date(data) DESC";
+        "SELECT d.*, c.nomeCategoria, c.status " +
+        "FROM Despesa d JOIN Categoria c ON d.idCategoria = c.idCategoria " +
+        "WHERE d.idUsuario = ? ORDER BY date(d.data) DESC";
 
     private static final String SQL_SELECT_BY_ID =
-        "SELECT * FROM Despesa WHERE idDespesa = ? AND idUsuario = ?";
+        "SELECT d.*, c.nomeCategoria, c.status " +
+        "FROM Despesa d JOIN Categoria c ON d.idCategoria = c.idCategoria " +
+        "WHERE d.idDespesa = ? AND d.idUsuario = ?";
 
     private static final String SQL_UPDATE =
-        "UPDATE Despesa SET nomeDespesa = ?, valor = ?, data = ?, idCategoria = ? WHERE idDespesa = ? AND idUsuario = ?";
+        "UPDATE Despesa SET nomeDespesa = ?, valor = ?, data = ?, idCategoria = ? " +
+        "WHERE idDespesa = ? AND idUsuario = ?";
 
     private static final String SQL_DELETE =
         "DELETE FROM Despesa WHERE idDespesa = ? AND idUsuario = ?";
 
     private static final String SQL_SELECT_PERIODO =
-        "SELECT * FROM Despesa WHERE idUsuario = ? AND date(data) BETWEEN ? AND ?";
+        "SELECT d.*, c.nomeCategoria, c.status " +
+        "FROM Despesa d JOIN Categoria c ON d.idCategoria = c.idCategoria " +
+        "WHERE d.idUsuario = ? AND date(d.data) BETWEEN ? AND ?";
 
     private static final String SQL_TOTAL_MENSAL =
         "SELECT SUM(valor) AS total FROM Despesa " +
         "WHERE idUsuario = ? AND strftime('%m', data) = ? AND strftime('%Y', data) = ?";
 
     private static final String SQL_SELECT_BY_TERM =
-        "SELECT * FROM Despesa WHERE nomeDespesa LIKE ? AND idUsuario = ?";
+        "SELECT d.*, c.nomeCategoria, c.status " +
+        "FROM Despesa d JOIN Categoria c ON d.idCategoria = c.idCategoria " +
+        "WHERE d.nomeDespesa LIKE ? AND d.idUsuario = ?";
 
     private static final String SQL_SELECT_BY_CATEGORY =
-        "SELECT * FROM Despesa WHERE idCategoria = ? AND idUsuario = ?";
+        "SELECT d.*, c.nomeCategoria, c.status " +
+        "FROM Despesa d JOIN Categoria c ON d.idCategoria = c.idCategoria " +
+        "WHERE d.idCategoria = ? AND d.idUsuario = ?";
 
     public boolean cadastrarDespesa(Despesa despesa) {
+
+        // ✅ Impede cadastro se a categoria estiver desativada
+        if (despesa.getCategoria() == null || !despesa.getCategoria().getStatus()) {
+            System.out.println("Erro: a categoria está desativada. Não é possível cadastrar a despesa.");
+            return false;
+        }
+
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
 
@@ -53,7 +72,7 @@ public class DespesaDAO {
             stmt.setString(3, despesa.getNomeDespesa());
             stmt.setDouble(4, despesa.getValor());
             stmt.setString(5, UtilData.formatarData(despesa.getData()));
-            stmt.setString(6, despesa.getIdCategoria());
+            stmt.setString(6, despesa.getCategoria().getIdCategoria());
 
             return stmt.executeUpdate() > 0;
 
@@ -112,7 +131,7 @@ public class DespesaDAO {
             PreparedStatement stmt = conn.prepareStatement(SQL_TOTAL_MENSAL)) {
 
             stmt.setString(1, idUsuario);
-            stmt.setString(2, String.format("%02d", mes)); // mês com 2 dígitos
+            stmt.setString(2, String.format("%02d", mes));
             stmt.setString(3, String.valueOf(ano));
 
             ResultSet rs = stmt.executeQuery();
@@ -166,13 +185,20 @@ public class DespesaDAO {
     }
 
     public boolean editarDespesa(Despesa despesa) {
+
+        //Impede edição se a categoria estiver desativada
+        if (despesa.getCategoria() == null || !despesa.getCategoria().getStatus()) {
+            System.out.println("Erro: a categoria está desativada. Não é possível editar a despesa.");
+            return false;
+        }
+
         try (Connection conn = DatabaseConnector.conectar();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE)) {
 
             stmt.setString(1, despesa.getNomeDespesa());
             stmt.setDouble(2, despesa.getValor());
             stmt.setString(3, UtilData.formatarData(despesa.getData()));
-            stmt.setString(4, despesa.getIdCategoria());
+            stmt.setString(4, despesa.getCategoria().getIdCategoria());
             stmt.setString(5, despesa.getIdDespesa());
             stmt.setString(6, despesa.getIdUsuario());
 
@@ -223,14 +249,20 @@ public class DespesaDAO {
 
     private Despesa mapResultSetToDespesa(ResultSet rs) throws SQLException {
 
-        Despesa d = new Despesa();
+        Categoria categoria = new Categoria(
+            rs.getString("idCategoria"),
+            rs.getString("nomeCategoria"),
+            rs.getBoolean("status"),
+            rs.getString("idUsuario")
+        );
 
+        Despesa d = new Despesa();
         d.setIdDespesa(rs.getString("idDespesa"));
         d.setIdUsuario(rs.getString("idUsuario"));
         d.setNomeDespesa(rs.getString("nomeDespesa"));
         d.setValor(rs.getDouble("valor"));
         d.setData(UtilData.parseDataBanco(rs.getString("data")));
-        d.setIdCategoria(rs.getString("idCategoria"));
+        d.setCategoria(categoria);
 
         return d;
     }

@@ -11,20 +11,27 @@ public class Despesa {
     private String nomeDespesa;
     private double valor;
     private Date data;
+    private Categoria categoria;
     private String idUsuario;
-    private String idCategoria;
 
     public Despesa() {}
 
-    public Despesa(String idUsuario, String nomeDespesa, double valor, Date data, String idCategoria) {
-        this.idUsuario = idUsuario;
-        this.nomeDespesa = nomeDespesa;
+    public Despesa(String nome, double valor, Date data, Categoria categoria, String idUsuario) {
+        this.nomeDespesa = nome;
         this.valor = valor;
         this.data = data;
-        this.idCategoria = idCategoria;
+        this.categoria = categoria;
+        this.idUsuario = idUsuario;
     }
 
     public static boolean cadastrarDespesa(Despesa despesa) {
+
+        // ✅ Impede cadastro se a categoria estiver desativada
+        if (despesa.getCategoria() == null || !despesa.getCategoria().getStatus()) {
+            System.out.println("Erro: a categoria está desativada. Não é possível cadastrar a despesa.");
+            return false;
+        }
+
         return new DespesaDAO().cadastrarDespesa(despesa);
     }
 
@@ -59,6 +66,13 @@ public class Despesa {
     }
 
     public void editarDespesa() {
+
+        // ✅ Impede edição se a categoria estiver desativada
+        if (this.categoria == null || !this.categoria.getStatus()) {
+            System.out.println("Erro: a categoria está desativada. Não é possível editar a despesa.");
+            return;
+        }
+
         new DespesaDAO().editarDespesa(this);
     }
 
@@ -70,7 +84,8 @@ public class Despesa {
         System.out.println("Descrição: " + nomeDespesa);
         System.out.println("Valor: R$ " + valor);
         System.out.println("Data: " + sdf.format(data));
-        System.out.println("Categoria (ID): " + idCategoria);
+        System.out.println("Categoria: " + categoria.getNomeCategoria());
+        System.out.println("Categoria (ID): " + categoria.getIdCategoria());
         System.out.println("Usuário (ID): " + idUsuario);
         System.out.println("---------------------------");
     }
@@ -87,9 +102,9 @@ public class Despesa {
     public Date getData() { return data; }
     public void setData(Date data) { this.data = data; }
 
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
+
     public String getIdUsuario() { return idUsuario; }
     public void setIdUsuario(String idUsuario) { this.idUsuario = idUsuario; }
-
-    public String getIdCategoria() { return idCategoria; }
-    public void setIdCategoria(String idCategoria) { this.idCategoria = idCategoria; }
 }

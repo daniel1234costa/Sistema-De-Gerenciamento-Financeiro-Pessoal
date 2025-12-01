@@ -27,8 +27,7 @@ public class Categoria {
         }
 
         CategoriaDAO dao = new CategoriaDAO();
-
-        // ✅ Agora busca categoria do usuário logado
+        
         if (dao.buscarCategoriaDoUsuario(nome, Sessao.getIdUsuarioLogado()) != null) {
             System.out.println("[ERRO] Já existe uma categoria com esse nome!");
             return null;
