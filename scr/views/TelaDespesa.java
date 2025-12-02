@@ -12,7 +12,7 @@ import model.UtilData;
 
 public class TelaDespesa {
 
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner leitor = new Scanner(System.in);
 
     public void exibirMenu() {
 
@@ -31,7 +31,16 @@ public class TelaDespesa {
             System.out.println("0 - Voltar");
             System.out.print("Escolha uma opção: ");
 
-            int opcao = Integer.parseInt(scanner.nextLine());
+            String entrada = leitor.nextLine().trim();
+
+            int opcao;
+
+            try {
+                opcao = Integer.parseInt(entrada);
+            } catch (NumberFormatException e) {
+                System.out.println("Digite apenas números.");
+                continue;
+            }
 
             if (opcao == 0) break;
 
@@ -53,19 +62,19 @@ public class TelaDespesa {
     private void cadastrarDespesa() {
 
         System.out.print("Nome da despesa: ");
-        String nome = scanner.nextLine();
+        String nome = leitor.nextLine();
 
         System.out.print("Valor: ");
         double valor;
         try {
-            valor = Double.parseDouble(scanner.nextLine());
+            valor = Double.parseDouble(leitor.nextLine());
         } catch (NumberFormatException e) {
             System.out.println("Valor inválido. Tente novamente.");
             return; 
         }
 
         System.out.print("Data (dd/MM/yyyy): ");
-        Date data = UtilData.parseDataUsuario(scanner.nextLine());
+        Date data = UtilData.parseDataUsuario(leitor.nextLine());
         
         if (data == null) {
             System.out.println("Data inválida. Tente novamente.");
@@ -87,7 +96,7 @@ public class TelaDespesa {
         System.out.println("------------------------------");
 
         System.out.print("Digite a POSIÇÃO da categoria (ex: 0, 1): ");
-        String entradaPosicao = scanner.nextLine();
+        String entradaPosicao = leitor.nextLine();
         
         int posicao;
         try {
@@ -142,7 +151,7 @@ public class TelaDespesa {
     private void editarDespesa() {
 
         System.out.print("Digite o ID da despesa: ");
-        String id = scanner.nextLine();
+        String id = leitor.nextLine();
 
         DespesaDAO dao = new DespesaDAO();
         Despesa d = dao.buscarPorId(id, Sessao.getIdUsuarioLogado());
@@ -153,16 +162,16 @@ public class TelaDespesa {
         }
 
         System.out.print("Novo nome: ");
-        d.setNomeDespesa(scanner.nextLine());
+        d.setNomeDespesa(leitor.nextLine());
 
         System.out.print("Novo valor: ");
-        d.setValor(Double.parseDouble(scanner.nextLine()));
+        d.setValor(Double.parseDouble(leitor.nextLine()));
 
         System.out.print("Nova data (dd/MM/yyyy): ");
-        d.setData(UtilData.parseDataUsuario(scanner.nextLine()));
+        d.setData(UtilData.parseDataUsuario(leitor.nextLine()));
 
         System.out.print("Novo ID de categoria: ");
-        String idCategoria = scanner.nextLine();
+        String idCategoria = leitor.nextLine();
 
         Categoria categoria = new CategoriaDAO().buscarCategoriaPorId(idCategoria);
 
@@ -185,7 +194,7 @@ public class TelaDespesa {
     private void excluirDespesa() {
 
         System.out.print("Digite o ID da despesa: ");
-        String id = scanner.nextLine();
+        String id = leitor.nextLine();
 
         if (Despesa.excluirDespesa(id)) {
             System.out.println("Despesa excluída com sucesso.");
@@ -197,7 +206,7 @@ public class TelaDespesa {
     private void visualizarDespesa() {
 
         System.out.print("Digite um termo para buscar a despesa: ");
-        String termo = scanner.nextLine();
+        String termo = leitor.nextLine();
 
         Despesa d = Despesa.buscarDespesa(termo);
 
@@ -212,7 +221,7 @@ public class TelaDespesa {
     private void listarPorCategoria() {
 
         System.out.print("Digite o ID da categoria: ");
-        String idCategoria = scanner.nextLine();
+        String idCategoria = leitor.nextLine();
 
         List<Despesa> lista = Despesa.listarDespesasPorCategoria(idCategoria);
 
@@ -229,10 +238,10 @@ public class TelaDespesa {
     private void listarPorPeriodo() {
 
         System.out.print("Data inicial (dd/MM/yyyy): ");
-        Date inicio = UtilData.parseDataUsuario(scanner.nextLine());
+        Date inicio = UtilData.parseDataUsuario(leitor.nextLine());
 
         System.out.print("Data final (dd/MM/yyyy): ");
-        Date fim = UtilData.parseDataUsuario(scanner.nextLine());
+        Date fim = UtilData.parseDataUsuario(leitor.nextLine());
 
         List<Despesa> lista = Despesa.listarDespesasPorPeriodo(inicio, fim);
 
@@ -249,7 +258,7 @@ public class TelaDespesa {
     private void buscarDespesa() {
 
         System.out.print("Digite um termo para buscar: ");
-        String termo = scanner.nextLine();
+        String termo = leitor.nextLine();
 
         Despesa d = Despesa.buscarDespesa(termo);
 
@@ -264,10 +273,10 @@ public class TelaDespesa {
     private void totalMensal() {
 
         System.out.print("Digite o mês (1-12): ");
-        int mes = Integer.parseInt(scanner.nextLine());
+        int mes = Integer.parseInt(leitor.nextLine());
 
         System.out.print("Digite o ano: ");
-        int ano = Integer.parseInt(scanner.nextLine());
+        int ano = Integer.parseInt(leitor.nextLine());
 
         double total = Despesa.calcularDespesaTotalMensal(mes, ano);
 
