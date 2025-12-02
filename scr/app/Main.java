@@ -87,7 +87,7 @@ public class Main {
         System.out.println("2. Módulo de Despesas ");
         System.out.println("3. Módulo de Categorias ");
         System.out.println("4. Meu Perfil");
-        System.out.println("9. Logout (Trocar Usuário)");
+        System.out.println("5. Logout (Trocar Usuário)");
         System.out.println("0. Sair do Sistema");
         System.out.println("==========================================");
         System.out.print("Escolha uma opção: ");
