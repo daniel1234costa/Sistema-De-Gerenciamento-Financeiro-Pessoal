@@ -80,14 +80,14 @@ public class UsuarioDAO {
             System.err.println("Erro ao buscar usuário por email: " + e.getMessage());
         } finally {
             DatabaseConnector.fecharConexao(conn);
-            // Fechamento seguro dos recursos
+            
             if (rs != null) { try { rs.close(); } catch (SQLException e) {} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) {} }
         }
         return usuario;
     }
     
-    // --- (C) Atualizar Usuário (UPDATE) ---
+  
     public boolean atualizarUsuario(Usuario usuario) {
         Connection conn = DatabaseConnector.conectar();
         PreparedStatement stmt = null;
@@ -95,14 +95,14 @@ public class UsuarioDAO {
         try {
             stmt = conn.prepareStatement(SQL_UPDATE);
             
-            // 1. Dados a serem atualizados
+           
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
             
-            // 3. Data de Nascimento (conversão)
+           
             stmt.setString(3, UtilData.formatarData(usuario.getDataNascimento()));
             
-            // 4. Condição WHERE (quem será atualizado)
+           
             stmt.setString(4, usuario.getIdUsuario()); 
 
             int linhasAfetadas = stmt.executeUpdate();
