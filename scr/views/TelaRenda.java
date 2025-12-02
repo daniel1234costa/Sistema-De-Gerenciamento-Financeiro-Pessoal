@@ -1,5 +1,4 @@
 package views;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -48,27 +47,68 @@ public class TelaRenda {
         }
     }
 
-    private void cadastrar() {
+  private void cadastrar() {
         System.out.println("\n--- NOVA RENDA ---");
-
         System.out.print("Nome: ");
         String nome = leitor.nextLine();
 
-        System.out.print("Valor: ");
-        double valor = Double.parseDouble(leitor.nextLine());
+        // 1. VALIDAÇÃO DE VALOR (Loop até ser positivo)
+        double valor = -1;
+        while (valor <= 0) {
+            System.out.print("Valor (maior que 0): ");
+            try {
+                valor = Double.parseDouble(leitor.nextLine().replace(",", "."));
+                if (valor <= 0) System.out.println("❌ Erro: O valor deve ser positivo!");
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Erro: Digite apenas números.");
+            }
+        }
 
-        System.out.print("Data (dd/MM/yyyy): ");
-        Date data = UtilData.parseDataUsuario(leitor.nextLine());
+        // 2. VALIDAÇÃO DE DATA (Loop até ser válida e ano <= 2025)
+        Date data = null;
+        while (data == null) {
+            try {
+                System.out.println("--- Informe a Data ---");
+                System.out.print("Dia: ");
+                int dia = Integer.parseInt(leitor.nextLine());
+                System.out.print("Mês: ");
+                int mes = Integer.parseInt(leitor.nextLine());
+                System.out.print("Ano: ");
+                int ano = Integer.parseInt(leitor.nextLine());
 
-        System.out.print("Tipo (1 = Fixa, 2 = Extra): ");
-        boolean tipo = Integer.parseInt(leitor.nextLine()) == 1;
+                // Regra do Ano
+                int anoAtual = java.time.Year.now().getValue(); // Pega ano atual (ex: 2025)
+                if (ano > anoAtual) {
+                    System.out.println("❌ Erro: O ano não pode ser maior que " + anoAtual);
+                    continue; // Volta pro começo do while
+                }
+                
+                // Monta e Valida formatação
+                String dataTexto = String.format("%02d/%02d/%d", dia, mes, ano);
+                data = UtilData.parseDataUsuario(dataTexto); // Retorna null se dia/mês forem inválidos
 
-        Renda nova = Renda.cadastrarRenda(nome, valor, data, tipo);
+                if (data == null) System.out.println("❌ Data inválida! Verifique dia e mês.");
 
-        if (nova != null) System.out.println("✅ Renda cadastrada!");
-        else System.out.println("❌ Erro ao cadastrar.");
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Digite apenas números inteiros!");
+            }
+        }
+
+        System.out.print("É fixa? (1-Sim / 0-Não): ");
+        String tipoStr = leitor.nextLine();
+        boolean tipo = tipoStr.equals("1");
+
+        Renda novaRenda = Renda.cadastrarRenda(nome, valor, data, tipo);
+
+        
+        if (novaRenda != null) {
+            System.out.println("\nSucesso! Renda cadastrada.");
+            System.out.println("ID gerado: " + novaRenda.getIdRenda());
+        } else {
+            System.out.println("\n Falha ao cadastrar. Tente novamente.");
+        }
     }
-
+    
     private void listarExtras() {
         System.out.println("\n--- EXTRAS ---");
         List<Renda> lista = Renda.listarRendasExtras();
