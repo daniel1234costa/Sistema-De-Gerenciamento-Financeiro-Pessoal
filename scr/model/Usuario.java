@@ -66,36 +66,17 @@ public class Usuario {
         }
     }
 
-    public static boolean atualizarUsuario(Usuario usuario) {
-        final UsuarioDAO usuarioDAO = new UsuarioDAO();
-        String sql = "UPDATE Usuario SET nome = ?, email = ?, data_nascimento = ? WHERE id_usuario = ?";
-
-    
-        try (java.sql.Connection conn = DatabaseConnector.conectar(); 
-             java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, usuario.getNome());
-            stmt.setString(2, usuario.getEmail());
-
-            if (usuario.getDataNascimento() != null) {
-                
-                String dataFormatada = UtilData.formatarData(usuario.getDataNascimento());
-                stmt.setString(3, dataFormatada); 
-            } else {
-                
-                stmt.setString(3, null); 
+        public static boolean atualizarUsuario(Usuario usuario) {
+            
+            
+            if (usuario.getNome().isEmpty()) {
+                System.out.println("Erro: Nome não pode ser vazio.");
+                return false;
             }
 
-            stmt.setString(4, usuario.getIdUsuario());
-
-            int linhasAfetadas = stmt.executeUpdate();
-            return linhasAfetadas > 0;
-
-        } catch (java.sql.SQLException e) {
-            System.err.println("Erro ao atualizar usuário: " + e.getMessage());
-            return false;
+            UsuarioDAO dao = new UsuarioDAO();
+            return dao.atualizarUsuario(usuario); 
         }
-    }
 
     public static boolean editarUsuario(Usuario usuario) {
         final UsuarioDAO usuarioDAO = new UsuarioDAO();
