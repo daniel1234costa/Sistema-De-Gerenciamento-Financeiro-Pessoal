@@ -33,7 +33,6 @@ public class TelaUsuario {
         int opcao = -1;
         
         while (opcao != 0) {
-            // Verifica se ainda está logado (caso tenha excluído a conta no loop anterior)
             if (!Sessao.isLogado()) return;
 
             System.out.println("\n===== MEU PERFIL =====");
@@ -47,7 +46,7 @@ public class TelaUsuario {
 
             if (scanner.hasNextInt()) {
                 opcao = scanner.nextInt();
-                scanner.nextLine(); // Consumir enter
+                scanner.nextLine(); 
             } else {
                 scanner.nextLine();
                 System.out.println("Opção inválida.");
@@ -94,21 +93,18 @@ public class TelaUsuario {
         System.out.println("\n--- EDITAR PERFIL ---");
         System.out.println("(Dica: Deixe vazio e aperte Enter para manter o valor atual)");
 
-        // 1. Editar Nome
         System.out.print("Novo Nome [" + usuario.getNome() + "]: ");
         String novoNome = scanner.nextLine();
         if (!novoNome.trim().isEmpty()) {
             usuario.setNome(novoNome);
         }
 
-        // 2. Editar Email
         System.out.print("Novo Email [" + usuario.getEmail() + "]: ");
         String novoEmail = scanner.nextLine();
         if (!novoEmail.trim().isEmpty()) {
             usuario.setEmail(novoEmail);
         }
 
-        // 3. Editar Data de Nascimento
         String dataAtualStr = (usuario.getDataNascimento() != null) ? UtilData.formatarData(usuario.getDataNascimento()) : "N/D";
         System.out.print("Nova Data (dd/MM/yyyy) [" + dataAtualStr + "]: ");
         String novaDataStr = scanner.nextLine();
@@ -122,7 +118,6 @@ public class TelaUsuario {
             }
         }
 
-        // Tenta salvar no banco
         if (Usuario.editarUsuario(usuario)) {
             System.out.println("------Novos dados foram fornecidos-----");
         } else {

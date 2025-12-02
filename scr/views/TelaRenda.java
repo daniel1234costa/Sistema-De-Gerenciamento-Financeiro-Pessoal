@@ -58,13 +58,12 @@ public class TelaRenda {
             System.out.print("Valor (maior que 0): ");
             try {
                 valor = Double.parseDouble(leitor.nextLine().replace(",", "."));
-                if (valor <= 0) System.out.println("❌ Erro: O valor deve ser positivo!");
+                if (valor <= 0) System.out.println("Erro: O valor deve ser positivo!");
             } catch (NumberFormatException e) {
-                System.out.println("❌ Erro: Digite apenas números.");
+                System.out.println("Erro: Digite apenas números.");
             }
         }
 
-        // 2. VALIDAÇÃO DE DATA (Loop até ser válida e ano <= 2025)
         Date data = null;
         while (data == null) {
             try {
@@ -77,20 +76,20 @@ public class TelaRenda {
                 int ano = Integer.parseInt(leitor.nextLine());
 
                 // Regra do Ano
-                int anoAtual = java.time.Year.now().getValue(); // Pega ano atual (ex: 2025)
+                int anoAtual = java.time.Year.now().getValue(); 
                 if (ano > anoAtual) {
-                    System.out.println("❌ Erro: O ano não pode ser maior que " + anoAtual);
+                    System.out.println(" Erro: O ano não pode ser maior que " + anoAtual);
                     continue; // Volta pro começo do while
                 }
                 
                 // Monta e Valida formatação
                 String dataTexto = String.format("%02d/%02d/%d", dia, mes, ano);
-                data = UtilData.parseDataUsuario(dataTexto); // Retorna null se dia/mês forem inválidos
+                data = UtilData.parseDataUsuario(dataTexto); 
 
-                if (data == null) System.out.println("❌ Data inválida! Verifique dia e mês.");
+                if (data == null) System.out.println(" Data inválida! Verifique dia e mês.");
 
             } catch (NumberFormatException e) {
-                System.out.println("❌ Digite apenas números inteiros!");
+                System.out.println(" Digite apenas números inteiros!");
             }
         }
 
@@ -141,7 +140,7 @@ public class TelaRenda {
         if (!valorStr.isEmpty()) renda.setValor(Double.parseDouble(valorStr));
 
         renda.editarRenda(renda.getNomeRenda(), renda.getValor());
-        System.out.println("✅ Renda atualizada!");
+        System.out.println(" Renda atualizada!");
     }
 
     private void excluir() {
@@ -155,8 +154,8 @@ public class TelaRenda {
             return;
         }
 
-        if (Renda.excluirRenda(renda)) System.out.println("✅ Renda excluída!");
-        else System.out.println("❌ Erro ao excluir.");
+        if (Renda.excluirRenda(renda)) System.out.println(" Renda excluída!");
+        else System.out.println(" Erro ao excluir.");
     }
 
     private void visualizar() {
