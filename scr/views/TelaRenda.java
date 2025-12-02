@@ -24,7 +24,14 @@ public class TelaRenda {
             System.out.println("0. Voltar");
             System.out.print("Opção: ");
 
-            int opcao = Integer.parseInt(leitor.nextLine());
+            String entrada = leitor.nextLine();
+            int opcao;
+              try {
+                opcao = Integer.parseInt(entrada);
+            } catch (NumberFormatException e) {
+                System.out.println("Digite apenas números.");
+                continue;
+            }
 
             if (opcao == 0) break;
 
