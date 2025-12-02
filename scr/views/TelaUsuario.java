@@ -173,27 +173,62 @@ public class TelaUsuario {
     }
 
     private void cadastrarUsuario() {
-        System.out.println("\n--- CADASTRO DE USUÁRIO ---");
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Senha: ");
-        String senha = scanner.nextLine();
-        System.out.print("Data de Nascimento (dd/MM/yyyy): ");
-        String dataStr = scanner.nextLine();
+    System.out.println("\n--- CADASTRO DE USUÁRIO ---");
+    System.out.print("Nome: ");
+    String nome = scanner.nextLine();
+    System.out.print("Email: ");
+    String email = scanner.nextLine();
+    System.out.print("Senha: ");
+    String senha = scanner.nextLine();
 
+   
+    java.util.Date dataNascimento = null;
+    final int ANO_LIMITE = java.time.Year.now().getValue(); 
+    
+    while (dataNascimento == null) {
         try {
-            Date dataNascimento = dateFormat.parse(dataStr);
-            boolean sucesso = Usuario.registrarUsuario(nome, email, senha, dataNascimento);
+            System.out.println("--- Informe a Data de Nascimento (Limite: " + ANO_LIMITE + ") ---");
+            System.out.print("Dia: ");
+            int dia = Integer.parseInt(scanner.nextLine());
+            System.out.print("Mês: ");
+            int mes = Integer.parseInt(scanner.nextLine());
+            System.out.print("Ano: ");
+            int ano = Integer.parseInt(scanner.nextLine());
+
+            // 1.1. Regra do Ano
+            if (ano > ANO_LIMITE) {
+                System.out.println("Erro: O ano de nascimento não pode ser maior que " + ANO_LIMITE + ".");
+                continue;
+            }
             
-            if (sucesso) System.out.println("Usuário registrado com sucesso! Faça login para continuar.");
-            else System.err.println("Falha ao registrar. -O email já existe.");
-            
-        } catch (ParseException e) {
-            System.err.println("Data inválida. Use o formato dd/MM/yyyy.");
+           
+            String dataTexto = String.format("%02d/%02d/%d", dia, mes, ano);
+           
+            dataNascimento = UtilData.parseDataUsuario(dataTexto); 
+
+            if (dataNascimento == null) {
+                System.out.println("Data inválida! Verifique se o dia e o mês são válidos.");
+                continue;
+            }
+
+            if (dataNascimento.after(new java.util.Date())) {
+                System.out.println("Erro: A data de nascimento não pode ser no futuro!");
+                dataNascimento = null;
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Digite apenas números inteiros para dia, mês e ano!");
         }
     }
+
+    boolean sucesso = Usuario.registrarUsuario(nome, email, senha, dataNascimento);
+    
+    if (sucesso) {
+        System.out.println("Usuário registrado com sucesso! Faça login para continuar.");
+    } else {
+        System.err.println("Falha ao registrar. - O email já existe.");
+    }
+}
 
     private Usuario realizarLogin() {
         System.out.println("\n--- LOGIN ---");
