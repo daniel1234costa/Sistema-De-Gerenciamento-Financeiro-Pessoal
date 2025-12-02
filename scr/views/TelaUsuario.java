@@ -1,15 +1,14 @@
 package views;
 
-import model.Usuario;
-import model.Sessao;
-import model.UtilData; 
 import dao.UsuarioDAO;
-
-import java.util.Scanner;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Scanner;
+import model.Sessao;
+import model.Usuario;
+import model.UtilData;
 
 public class TelaUsuario {
 
@@ -41,6 +40,7 @@ public class TelaUsuario {
             System.out.println("1. Visualizar Meus Dados");
             System.out.println("2. Editar Meus Dados");
             System.out.println("3. Excluir Minha Conta");
+            System.out.println("4. Visualizar Relatório Financeiro");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.println("======================");
             System.out.print("Escolha uma opção: ");
@@ -65,6 +65,8 @@ public class TelaUsuario {
                     if (excluirConta()) {
                         return; 
                     }
+                case 4:
+                    visualizarRelatorioFinanceiro();
                     break;
                 case 0:
                     System.out.println("Voltando ao menu principal...");
@@ -155,6 +157,7 @@ public class TelaUsuario {
         }
         return false;
     }
+    
     private Usuario buscarUsuarioLogado() {
         String idLogado = Sessao.getIdUsuarioLogado();
         if (idLogado == null) return null;
@@ -185,7 +188,7 @@ public class TelaUsuario {
             boolean sucesso = Usuario.registrarUsuario(nome, email, senha, dataNascimento);
             
             if (sucesso) System.out.println("Usuário registrado com sucesso! Faça login para continuar.");
-            else System.err.println("Falha ao registrar. Verifique se o email já existe.");
+            else System.err.println("Falha ao registrar. -O email já existe.");
             
         } catch (ParseException e) {
             System.err.println("Data inválida. Use o formato dd/MM/yyyy.");
@@ -205,5 +208,23 @@ public class TelaUsuario {
             System.err.println(" Login falhou. Email ou senha incorretos.");
         }
         return usuarioLogado;
+    }
+
+    private void visualizarRelatorioFinanceiro() {
+
+        Usuario usuario = buscarUsuarioLogado();
+        if (usuario == null) return;
+
+        System.out.println("\n--- RELATÓRIO FINANCEIRO ---");
+
+        System.out.print("Data inicial (dd/MM/yyyy): ");
+        String inicio = scanner.nextLine();
+
+        System.out.print("Data final (dd/MM/yyyy): ");
+        String fim = scanner.nextLine();
+
+        String relatorio = usuario.listarRendasDespesasPorPeriodo(inicio, fim);
+
+        System.out.println(relatorio);
     }
 }

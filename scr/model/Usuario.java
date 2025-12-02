@@ -1,8 +1,13 @@
 package model;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import org.mindrot.jbcrypt.BCrypt;
+
+import dao.DespesaDAO;
+import dao.RendaDAO;
 import dao.UsuarioDAO; 
 
 public class Usuario {
@@ -144,6 +149,46 @@ public class Usuario {
         } else {
             System.out.println("Usuário não encontrado com o email: " + email);
         }
+    }
+
+    public String listarRendasDespesasPorPeriodo(String inicio, String fim) {
+        Date dataInicio = UtilData.parseDataUsuario(inicio);
+        Date dataFim = UtilData.parseDataUsuario(fim);
+
+        if (dataInicio == null || dataFim == null) {
+            return "Datas inválidas. Use o formato dd/MM/yyyy.";
+        }
+
+        String idUsuario = this.idUsuario;
+
+        List<Despesa> despesas = new DespesaDAO().listarDespesasPorPeriodo(idUsuario, dataInicio, dataFim);
+
+        double totalDespesas = 0;
+        for (Despesa d : despesas) {
+            totalDespesas += d.getValor();
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dataInicio);
+
+        int mes = cal.get(Calendar.MONTH) + 1;
+        int ano = cal.get(Calendar.YEAR);
+
+        double totalRendas = new RendaDAO().calcularRendaTotalMensal(mes, ano, idUsuario);
+
+        double saldo = totalRendas - totalDespesas;
+
+        StringBuilder relatorio = new StringBuilder();
+        relatorio.append("\n===== RELATÓRIO FINANCEIRO =====\n");
+        relatorio.append("Período: ").append(inicio).append(" até ").append(fim).append("\n\n");
+
+        relatorio.append("Total de Rendas (mês): R$ ").append(totalRendas).append("\n");
+        relatorio.append("Total de Despesas (período): R$ ").append(totalDespesas).append("\n");
+        relatorio.append("Saldo do Período: R$ ").append(saldo).append("\n");
+
+        relatorio.append("\n===============================\n");
+
+        return relatorio.toString();
     }
 
     public String getIdUsuario() {
