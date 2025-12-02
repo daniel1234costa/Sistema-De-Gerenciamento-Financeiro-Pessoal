@@ -54,7 +54,7 @@ public class DespesaDAO {
 
     public boolean cadastrarDespesa(Despesa despesa) {
 
-
+      
         if (despesa.getCategoria() == null || !despesa.getCategoria().getStatus()) {
             System.out.println("Erro: a categoria está desativada. Não é possível cadastrar a despesa.");
             return false;
