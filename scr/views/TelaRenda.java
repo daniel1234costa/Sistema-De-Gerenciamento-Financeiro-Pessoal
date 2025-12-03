@@ -52,7 +52,7 @@ public class TelaRenda {
         System.out.print("Nome: ");
         String nome = leitor.nextLine();
 
-        // 1. VALIDAÇÃO DE VALOR (Loop até ser positivo)
+        
         double valor = -1;
         while (valor <= 0) {
             System.out.print("Valor (maior que 0): ");
@@ -75,7 +75,7 @@ public class TelaRenda {
                 System.out.print("Ano: ");
                 int ano = Integer.parseInt(leitor.nextLine());
 
-                // Regra do Ano
+                
                 int anoAtual = java.time.Year.now().getValue(); 
                 if (ano > anoAtual) {
                     System.out.println(" Erro: O ano não pode ser maior que " + anoAtual);
