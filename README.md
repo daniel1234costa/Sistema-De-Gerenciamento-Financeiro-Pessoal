@@ -1,16 +1,44 @@
-# CashMind
-## Sistema de gerenciamento financeiro pessoal
-O objetivo principal do sistema é fornecer aos usuários uma ferramenta eficaz para controlar e visualizar suas finanças pessoais, ajudando-os a gerenciar melhor seu capital de forma organizada e segura.
+#  CashMind
 
-Ao cadastrar-se no sistema, o usuário terá um perfil pessoal onde poderá gerenciar suas informações e, através de um processo de login, acessar funcionalidades de gerenciamento financeiro.
 
-O sistema oferece um conjunto completo de funcionalidades para a manipulação dos diversos registros, incluindo as operações de inserir, editar, visualizar, listar e excluir, além de um mecanismo de busca para localizar informações rapidamente.
+[![Tecnologia Principal](https://img.shields.io/badge/Tecnologia-Java-red)](https://www.java.com/)
 
-O usuário consegue registrar suas rendas, com a possibilidade de caracterizá-las como “renda fixa” ou “renda extra”, permitindo uma análise mais detalhada.
+## Sistema de Gerenciamento Financeiro Pessoal
 
-Além de dividir as despesas, as categorias permitem uma análise mais granular dos gastos, facilitando a identificação de onde o dinheiro está sendo gasto. Isso proporciona flexibilidade na organização financeira do usuário.
+> O **CashMind** é uma ferramenta eficaz para controlar e visualizar suas finanças pessoais. Nosso objetivo é ajudar você a gerenciar melhor seu capital de forma organizada e segura.
 
-Um recurso fundamental é a capacidade de exibir relatórios financeiros por período: diário, mensal e anual. Esses relatórios consolidam rendas e despesas, oferecendo uma visão clara da situação financeira do usuário em um intervalo de tempo específico, auxiliando na tomada de decisões financeiras.
+---
 
-Todos os dados serão armazenados para acesso futuro, garantindo a continuidade de controle financeiro.
+##  Recursos
+
+O sistema CashMind oferece um conjunto completo de funcionalidades de controle financeiro:
+
+* **Controle Total de Registros:** Operações completas de **Inserir, Editar, Visualizar, Listar e Excluir** para todos os seus dados.
+* **Gestão de Rendas Detalhada:** Registre suas rendas e categorize-as como **"Renda Fixa"** ou **"Renda Extra"** para análises mais precisas.
+* **Categorização de Despesas:** Divida suas despesas em categorias personalizadas para uma **análise granular** dos gastos.
+* **Relatórios por Período:** Exibição de relatórios consolidados (rendas vs. despesas) por períodos **Diário, Mensal e Anual**, auxiliando na tomada de decisões.
+* **Segurança e Acesso:** Perfil pessoal e acesso seguro através de um processo de login.
+* **Mecanismo de Busca:** Ferramenta rápida para localizar qualquer informação financeira.
+
+##   Tecnologia utilizada
+
+O CashMind foi construído com foco em desempenho e confiabilidade:
+
+| Categoria | Tecnologia | Versão Mínima |
+| :--- | :--- | :--- |
+| **Linguagem Principal** | **Java** | JDK 17+ |
+| **Banco de Dados** | **SQLite** | (Integrado, sem servidor) |
+
+### 1. Primeiro Acesso
+* Crie sua conta e senha no sistema para acessar sua área pessoal.
+
+### 2. Gerenciamento de Dados
+* Utilize o menu principal para registrar suas **Rendas** e **Despesas** diariamente.
+* Defina as **Categorias** antes de registrar as despesas para uma organização mais eficaz.
+
+### 3. Diagrama de Classe
+
+O diagrama a seguir representa a estrutura e o relacionamento das principais entidades do sistema:
+
+![Diagrama de Classe](diagrama/DiagramaClasse.png)
 
